@@ -22,9 +22,8 @@ Makefile
 autom4te.cache
 config.log
 config.status
-docs/doxygen/html
-docs/doxygen/xml
-docs/doxygen/latex
+docs/doxygen
+docs/sphinx
 site
 _build
 _static

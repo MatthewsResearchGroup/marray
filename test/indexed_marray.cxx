@@ -1,5 +1,5 @@
 #include "indexed/indexed_marray.hpp"
-#include "catch_amalgamated.hpp"
+#include <catch2/catch_all.hpp>
 
 using namespace std;
 using namespace MArray;
