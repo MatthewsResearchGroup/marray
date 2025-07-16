@@ -153,7 +153,12 @@ if(ENABLE_TESTS)
             list(APPEND CLANG_LIBS -lclangSupport)
         endif()
 
-        list(APPEND CLANG_LIBS -lc++)
+        # Not sure when this is actually needed, but it
+        # *is needed* on an MBP (with homebrew clang) but
+        # *is not needed* on Linux (e.g. CircleCI)
+        if(APPLE)
+            list(APPEND CLANG_LIBS -lc++)
+        endif()
 
         if (POLICY CMP0135)
             cmake_policy(SET CMP0135 NEW)
