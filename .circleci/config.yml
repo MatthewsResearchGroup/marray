@@ -6,7 +6,7 @@ orbs:
 jobs:
   build:
     docker:
-      - image: 'cimg/base:2024.10'
+      - image: 'cimg/base:2025.06'
     steps:
       - checkout
       - run:

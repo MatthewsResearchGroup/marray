@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.23)
 
 file(READ version MARRAY_VERSION_RAW)
 set(MARRAY_VERSION "${MARRAY_VERSION_RAW}")
