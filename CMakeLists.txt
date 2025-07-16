@@ -155,9 +155,12 @@ if(ENABLE_TESTS)
 
         list(APPEND CLANG_LIBS -lc++)
 
+        if (POLICY CMP0135)
+            cmake_policy(SET CMP0135 NEW)
+        endif()
+
         ExternalProject_Add(force-cover
             URL "https://github.com/emilydolson/force-cover/archive/refs/tags/v3.0.tar.gz"
-            DOWNLOAD_EXTRACT_TIMESTAMP OFF
             PREFIX ${CMAKE_CURRENT_BINARY_DIR}
             CONFIGURE_COMMAND ""
             BUILD_IN_SOURCE ON
