@@ -156,7 +156,7 @@ if(ENABLE_TESTS)
         list(APPEND CLANG_LIBS -lc++)
 
         ExternalProject_Add(force-cover
-            URL https://github.com/emilydolson/force-cover/archive/refs/tags/v3.0.tar.gz
+            URL "https://github.com/emilydolson/force-cover/archive/refs/tags/v3.0.tar.gz"
             DOWNLOAD_EXTRACT_TIMESTAMP OFF
             PREFIX ${CMAKE_CURRENT_BINARY_DIR}
             CONFIGURE_COMMAND ""
