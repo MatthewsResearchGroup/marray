@@ -1,5 +1,5 @@
 AC_INIT(MArray,
-    m4_normalize(m4_include([version])),
+    m4_normalize(m4_include([marray-version])),
     damatthews@smu.edu,
     marray,
     http://www.github.com/MatthewsResearchGroup/marray
