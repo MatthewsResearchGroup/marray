@@ -237,47 +237,64 @@ if(ENABLE_TESTS)
         set(MARRAY_DIR "${PROCESSED_DIR}/marray")
     endif()
 
-    add_executable(test ${MARRAY_SOURCES})
-    set_target_properties(test PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
-    target_link_libraries(test Catch2::Catch2WithMain)
-    target_include_directories(test PRIVATE ${MARRAY_DIR})
-
-    set_target_properties(test
-        PROPERTIES
+    add_executable(marray-test ${MARRAY_SOURCES})
+    set_target_properties(marray-test PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin
+        RUNTIME_OUTPUT_NAME test
         CXX_STANDARD 20
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS OFF
     )
+    target_link_libraries(marray-test Catch2::Catch2WithMain)
+    target_include_directories(marray-test PRIVATE ${MARRAY_DIR})
 
     if(ENABLE_COVERAGE)
-        target_compile_options(test PRIVATE -fprofile-instr-generate -fcoverage-mapping)
-        target_link_options(test PRIVATE -fprofile-instr-generate -fcoverage-mapping)
+        target_compile_options(marray-test PRIVATE -fprofile-instr-generate -fcoverage-mapping)
+        target_link_options(marray-test PRIVATE -fprofile-instr-generate -fcoverage-mapping)
     endif()
 endif()
 
 add_library(marray INTERFACE)
-
+target_include_directories(marray INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:${INSTALL_INCLUDEDIR}>
+)
 target_sources(marray
     INTERFACE FILE_SET headers TYPE HEADERS
     FILES ${MARRAY_HEADERS}
 )
-
 install(TARGETS marray EXPORT marray-targets
     FILE_SET headers DESTINATION ${INSTALL_INCLUDEDIR}
+)
+install(EXPORT marray-targets
+    FILE MArrayTargets.cmake
+    NAMESPACE MArray::
+    DESTINATION ${INSTALL_LIBDIR}/cmake/MArray
+)
+
+write_basic_package_version_file(
+    "MArrayConfigVersion.cmake"
+    VERSION ${CMAKE_PACKAGE_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+install(FILES "MArrayConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/MArrayConfigVersion.cmake"
+    DESTINATION ${INSTALL_LIBDIR}/cmake/MArray
 )
 
 find_program(SPHINX sphinx-build)
 find_program(DOXYGEN doxygen)
 
 if (SPHINX AND DOXYGEN)
-    add_custom_target(docs
+    add_custom_target(marray-docs
         COMMAND ${SPHINX} "${CMAKE_CURRENT_SOURCE_DIR}/docs" "${CMAKE_CURRENT_BINARY_DIR}docs/sphinx"
     )
 else()
-    add_custom_target(docs
+    add_custom_target(marray-docs
         COMMAND ""
         COMMENT "sphinx and doxygen (and the sphinx plugins breathe, \
 myst_parser, and sphinx-rtd-theme) are required for \
 building documentation"
     )
+    add_dependency(docs marray-docs)
 endif()
