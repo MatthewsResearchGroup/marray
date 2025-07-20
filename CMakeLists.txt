@@ -296,5 +296,5 @@ else()
 myst_parser, and sphinx-rtd-theme) are required for \
 building documentation"
     )
-    add_dependency(docs marray-docs)
+    add_dependencies(docs marray-docs)
 endif()
