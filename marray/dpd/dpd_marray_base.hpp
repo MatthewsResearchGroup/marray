@@ -239,7 +239,7 @@ struct dpd_base
         auto log2_floor = [&](unsigned x)
         {
             //assumes x > 0
-            auto i = 1;
+            auto i = 0;
             while (x >>= 1) i++;
             return i;
         };
@@ -251,7 +251,7 @@ struct dpd_base
 
         auto log2_ceil = [&](unsigned x)
         {
-            return log2_floor(x) + (is_power_of_two(x) ? 0 : 1);
+            return log2_floor(x) + !is_power_of_two(x);
         };
 
         if (layout == BALANCED_ROW_MAJOR ||
