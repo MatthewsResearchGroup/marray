@@ -91,7 +91,7 @@ class irrep_iterator
 
     public:
         irrep_iterator(int irrep, int nirrep, int ndim)
-        : irrep_(irrep), ndim_(ndim), irrep_bits_(__builtin_popcount(nirrep-1)),
+        : irrep_(irrep), ndim_(ndim), irrep_bits_(nirrep == 1 ? 0 : nirrep == 2 ? 1 : nirrep == 4 ? 2 : 3),
           irrep_mask_(nirrep-1), nblock_(ndim == 0 ? (irrep == 0 ? 1 : 0) : 1u << (irrep_bits_*(ndim-1)))
         {
             MARRAY_ASSERT(ndim >= 0);
@@ -236,17 +236,20 @@ struct dpd_base
     {
         dim_vector depth;
 
-        auto log2_floor = [&](int x)
+        auto log2_floor = [&](unsigned x)
         {
-            return sizeof(x)*CHAR_BIT - __builtin_clz(x) - 1;
+            //assumes x > 0
+            auto i = 1;
+            while (x >>= 1) i++;
+            return i;
         };
 
-        auto is_power_of_two = [&](int x)
+        auto is_power_of_two = [&](unsigned x)
         {
             return (x & (x-1)) == 0;
         };
 
-        auto log2_ceil = [&](int x)
+        auto log2_ceil = [&](unsigned x)
         {
             return log2_floor(x) + (is_power_of_two(x) ? 0 : 1);
         };
