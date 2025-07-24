@@ -1,6 +1,7 @@
 #ifndef MARRAY_VECTOR_HPP
 #define MARRAY_VECTOR_HPP
 
+#include <cstring>
 #include <complex>
 #include <type_traits>
 
