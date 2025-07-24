@@ -83,9 +83,7 @@ if(ENABLE_TESTS)
       Catch2
       GIT_REPOSITORY https://github.com/catchorg/Catch2.git
       GIT_TAG 2b60af89e23d28eefc081bc930831ee9d45ea58b # v3.8.1
-      FIND_PACKAGE_ARGS
     )
-
     FetchContent_MakeAvailable(Catch2)
 
     get_target_property(CATCH2_INCLUDES Catch2::Catch2 INTERFACE_INCLUDE_DIRECTORIES)
