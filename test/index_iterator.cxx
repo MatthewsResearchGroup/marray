@@ -1,5 +1,4 @@
-#include "index_iterator.hpp"
-
+#include "marray/index_iterator.hpp"
 #include <catch2/catch_all.hpp>
 
 using namespace std;

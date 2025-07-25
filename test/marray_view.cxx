@@ -1,5 +1,6 @@
-#include "marray.hpp"
-#include "rotate.hpp"
+#include "marray/marray.hpp"
+#include "marray/rotate.hpp"
+#include "marray/expression.hpp"
 #include <catch2/catch_all.hpp>
 
 using namespace std;
@@ -588,8 +589,84 @@ TEST_CASE("marray_view::assign")
 {
     double data1[6] = {0, 1, 2,
                        3, 4, 5};
-    int data2[6] = {0, 1, 2,
-                    3, 4, 5};
+    int data2[6] = {3, 4, 5,
+                    0, 1, 2};
+
+    marray<double,2> v0{2, 3};
+    marray_view<double,2> v1(v0);
+
+    v1 = marray_view<double,2>({2, 3}, data1);
+    CHECK(v1.lengths() == array<len_type,2>{2, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{0, 1, 2,
+                                                          3, 4, 5});
+
+    v1 = 1.0;
+    CHECK(v1.lengths() == array<len_type,2>{2, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{1, 1, 1,
+                                                          1, 1, 1});
+
+    v1 = marray_view<int,2>({2, 3}, data2);
+    CHECK(v1.lengths() == array<len_type,2>{2, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{3, 4, 5,
+                                                          0, 1, 2});
+
+    v1 = 1;
+    CHECK(v1.lengths() == array<len_type,2>{2, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{1, 1, 1,
+                                                          1, 1, 1});
+
+    v1 = marray_view<const double>({2, 3}, data1);
+    CHECK(v1.lengths() == array<len_type,2>{2, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{0, 1, 2,
+                                                          3, 4, 5});
+
+    v1 = marray_view<double>({2, 3}, data1);
+    CHECK(v1.lengths() == array<len_type,2>{2, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{0, 1, 2,
+                                                          3, 4, 5});
+
+    v1 = marray_view<int>({2, 3}, data2);
+    CHECK(v1.lengths() == array<len_type,2>{2, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{3, 4, 5,
+                                                          0, 1, 2});
+
+    v1 = marray_view<const double>({2, 3}, data1);
+    CHECK(v1.lengths() == array<len_type,2>{2, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{0, 1, 2,
+                                                          3, 4, 5});
+
+    marray<double> v5{2, 3};
+    marray<double,2> v6{2, 3};
+
+    v5 = marray_view<int,2>({2, 3}, data2);
+    v1 = v5;
+    CHECK(v1.lengths() == array<len_type,2>{2, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{3, 4, 5,
+                                                          0, 1, 2});
+
+    v6 = marray_view<double,2>({2, 3}, data1);
+    v1 = v6;
+    CHECK(v1.lengths() == array<len_type,2>{2, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{0, 1, 2,
+                                                          3, 4, 5});
+}
+
+TEST_CASE("varray_view::assign")
+{
+    double data1[6] = {0, 1, 2,
+                       3, 4, 5};
+    int data2[6] = {3, 4, 5,
+                    0, 1, 2};
 
     marray<double> v0{2, 3};
     marray_view<double> v1(v0);
@@ -609,8 +686,8 @@ TEST_CASE("marray_view::assign")
     v1 = marray_view<int>({2, 3}, data2);
     CHECK(v1.lengths() == len_vector{2, 3});
     CHECK(v1.strides() == stride_vector{3, 1});
-    CHECK(*(array<double,6>*)v1.data() == array<double,6>{0, 1, 2,
-                                                          3, 4, 5});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{3, 4, 5,
+                                                          0, 1, 2});
 
     v1 = 1;
     CHECK(v1.lengths() == len_vector{2, 3});
@@ -619,6 +696,41 @@ TEST_CASE("marray_view::assign")
                                                           1, 1, 1});
 
     v1 = marray_view<const double>({2, 3}, data1);
+    CHECK(v1.lengths() == len_vector{2, 3});
+    CHECK(v1.strides() == stride_vector{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{0, 1, 2,
+                                                          3, 4, 5});
+
+    v1 = marray_view<double,2>({2, 3}, data1);
+    CHECK(v1.lengths() == len_vector{2, 3});
+    CHECK(v1.strides() == stride_vector{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{0, 1, 2,
+                                                          3, 4, 5});
+
+    v1 = marray_view<int,2>({2, 3}, data2);
+    CHECK(v1.lengths() == len_vector{2, 3});
+    CHECK(v1.strides() == stride_vector{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{3, 4, 5,
+                                                          0, 1, 2});
+
+    v1 = marray_view<const double,2>({2, 3}, data1);
+    CHECK(v1.lengths() == len_vector{2, 3});
+    CHECK(v1.strides() == stride_vector{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{0, 1, 2,
+                                                          3, 4, 5});
+
+    marray<double> v5{2, 3};
+    marray<double,2> v6{2, 3};
+
+    v5 = marray_view<int,2>({2, 3}, data2);
+    v1 = v5;
+    CHECK(v1.lengths() == len_vector{2, 3});
+    CHECK(v1.strides() == stride_vector{3, 1});
+    CHECK(*(array<double,6>*)v1.data() == array<double,6>{3, 4, 5,
+                                                          0, 1, 2});
+
+    v6 = marray_view<double,2>({2, 3}, data1);
+    v1 = v6;
     CHECK(v1.lengths() == len_vector{2, 3});
     CHECK(v1.strides() == stride_vector{3, 1});
     CHECK(*(array<double,6>*)v1.data() == array<double,6>{0, 1, 2,
@@ -1135,6 +1247,124 @@ TEST_CASE("varray_view::access")
     CHECK(v3.lengths() == len_vector{2});
     CHECK(v3.strides() == stride_vector{6});
     CHECK(v3.data() == v1.data() + 1);
+}
+
+TEST_CASE("marray_view::access_and_assign")
+{
+    array<double,12> data1 = { 0, 1, 2,
+                               3, 4, 5,
+                               6, 7, 8,
+                               9,10,11};
+    array<double,2> data2 = {-1, -2};
+    array<double,3> data3 = {12, 13, 14};
+    array<double,6> data4 = { 0, 1, 2,
+                              3, 4, 5};
+
+    marray<double> v0{4, 3};
+    marray_view<double,2> v1(v0);
+    v1 = marray_view<double>({4, 3}, data1.data());
+
+    v1(slice::all, range(2)) = 1.0;
+    CHECK(v1.lengths() == array<len_type,2>{4, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,12>*)v1.data() == array<double,12>{ 1, 1, 2,
+                                                             1, 1, 5,
+                                                             1, 1, 8,
+                                                             1, 1,11});
+
+    v1(range(0, 4, 2), 1) = marray_view<double>({2}, data2.data());
+    CHECK(v1.lengths() == array<len_type,2>{4, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,12>*)v1.data() == array<double,12>{ 1,-1, 2,
+                                                             1, 1, 5,
+                                                             1,-2, 8,
+                                                             1, 1,11});
+
+    v1[3][slice::all] = marray_view<double,1>({3}, data3.data());
+    CHECK(v1.lengths() == array<len_type,2>{4, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,12>*)v1.data() == array<double,12>{ 1,-1, 2,
+                                                             1, 1, 5,
+                                                             1,-2, 8,
+                                                            12,13,14});
+
+    v1[range(1,3)] = marray_view<double,2>({2,3}, data4.data());
+    CHECK(v1.lengths() == array<len_type,2>{4, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,12>*)v1.data() == array<double,12>{ 1,-1, 2,
+                                                             0, 1, 2,
+                                                             3, 4, 5,
+                                                            12,13,14});
+
+    v1[2] = 0;
+    CHECK(v1.lengths() == array<len_type,2>{4, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,12>*)v1.data() == array<double,12>{ 1,-1, 2,
+                                                             0, 1, 2,
+                                                             0, 0, 0,
+                                                            12,13,14});
+
+    v1[2] = v1[3];
+    CHECK(v1.lengths() == array<len_type,2>{4, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,12>*)v1.data() == array<double,12>{ 1,-1, 2,
+                                                             0, 1, 2,
+                                                            12,13,14,
+                                                            12,13,14});
+
+    v1[2] = v1(0, slice::all);
+    CHECK(v1.lengths() == array<len_type,2>{4, 3});
+    CHECK(v1.strides() == array<stride_type,2>{3, 1});
+    CHECK(*(array<double,12>*)v1.data() == array<double,12>{ 1,-1, 2,
+                                                             0, 1, 2,
+                                                             1,-1, 2,
+                                                            12,13,14});
+}
+
+TEST_CASE("varray_view::access_and_assign")
+{
+    array<double,12> data1 = { 0, 1, 2,
+                               3, 4, 5,
+                               6, 7, 8,
+                               9,10,11};
+    array<double,2> data2 = {-1, -2};
+    array<double,3> data3 = {12, 13, 14};
+
+    marray<double> v0{4, 3};
+    marray_view<double> v1(v0);
+    v1 = marray_view<double>({4, 3}, data1.data());
+
+    v1(slice::all, range(2)) = 1.0;
+    CHECK(v1.lengths() == len_vector{4, 3});
+    CHECK(v1.strides() == stride_vector{3, 1});
+    CHECK(*(array<double,12>*)v1.data() == array<double,12>{ 1, 1, 2,
+                                                             1, 1, 5,
+                                                             1, 1, 8,
+                                                             1, 1,11});
+
+    v1(range(0, 4, 2), 1) = marray_view<double>({2}, data2.data());
+    CHECK(v1.lengths() == len_vector{4, 3});
+    CHECK(v1.strides() == stride_vector{3, 1});
+    CHECK(*(array<double,12>*)v1.data() == array<double,12>{ 1,-1, 2,
+                                                             1, 1, 5,
+                                                             1,-2, 8,
+                                                             1, 1,11});
+
+    v1(3, slice::all) = marray_view<double,1>({3}, data3.data());
+    CHECK(v1.lengths() == len_vector{4, 3});
+    CHECK(v1.strides() == stride_vector{3, 1});
+    CHECK(*(array<double,12>*)v1.data() == array<double,12>{ 1,-1, 2,
+                                                             1, 1, 5,
+                                                             1,-2, 8,
+                                                            12,13,14});
+
+    v1(2, slice::all) = v1(0, slice::all);
+    CHECK(v1.lengths() == len_vector{4, 3});
+    CHECK(v1.strides() == stride_vector{3, 1});
+    CHECK(*(array<double,12>*)v1.data() == array<double,12>{ 1,-1, 2,
+                                                             1, 1, 5,
+                                                             1,-1, 2,
+                                                            12,13,14});
 }
 
 TEST_CASE("marray_view::iteration")

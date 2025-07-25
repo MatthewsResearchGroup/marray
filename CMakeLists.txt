@@ -77,7 +77,7 @@ if(ENABLE_TESTS)
         test/short_vector.cxx
     )
 
-    set(MARRAY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/marray")
+    set(MARRAY_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
     FetchContent_Declare(
       Catch2
@@ -203,7 +203,7 @@ if(ENABLE_TESTS)
                     -- -xc++ -std=c++20
                     -resource-dir ${RESOURCE_DIR}
                     "${INCLUDE_LIST}"
-                    "-I${CMAKE_CURRENT_SOURCE_DIR}/marray"
+                    "-I${CMAKE_CURRENT_SOURCE_DIR}"
                     "${CATCH2_CFLAGS}"
 	                -DMARRAY_ENABLE_ASSERTS
                     > "${PROCESSED_DIR}/${file}"
@@ -222,7 +222,7 @@ if(ENABLE_TESTS)
                     -- -xc++ -std=c++20
                     -resource-dir ${RESOURCE_DIR}
                     "${INCLUDE_LIST}"
-                    "-I${CMAKE_CURRENT_SOURCE_DIR}/marray"
+                    "-I${CMAKE_CURRENT_SOURCE_DIR}"
                     "${CATCH2_CFLAGS}"
 	                -DMARRAY_ENABLE_ASSERTS
                     > "${PROCESSED_DIR}/${file}"
@@ -232,7 +232,7 @@ if(ENABLE_TESTS)
         endforeach()
 
         set(MARRAY_SOURCES ${PROCESSED_SOURCES})
-        set(MARRAY_DIR "${PROCESSED_DIR}/marray")
+        set(MARRAY_DIR "${PROCESSED_DIR}")
     endif()
 
     add_executable(marray-test ${MARRAY_SOURCES})

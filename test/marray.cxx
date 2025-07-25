@@ -1,6 +1,5 @@
-#include "marray.hpp"
-
-#include "rotate.hpp"
+#include "marray/marray.hpp"
+#include "marray/rotate.hpp"
 #include <catch2/catch_all.hpp>
 
 using namespace std;

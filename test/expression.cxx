@@ -1,6 +1,6 @@
+#include "marray/marray.hpp"
+#include "marray/expression.hpp"
 #include <catch2/catch_all.hpp>
-#include "marray.hpp"
-#include "expression.hpp"
 
 #include <typeinfo>
 #include <complex>

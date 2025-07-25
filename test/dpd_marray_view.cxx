@@ -1,4 +1,4 @@
-#include "dpd/dpd_marray.hpp"
+#include "marray/dpd/dpd_marray.hpp"
 #include <catch2/catch_all.hpp>
 
 using namespace std;

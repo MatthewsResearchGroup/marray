@@ -1,5 +1,5 @@
+#include "marray/dpd/dpd_range.hpp"
 #include <catch2/catch_all.hpp>
-#include "dpd/dpd_range.hpp"
 
 using namespace std;
 using namespace MArray;

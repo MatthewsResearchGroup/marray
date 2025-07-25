@@ -1,4 +1,4 @@
-#include "short_vector.hpp"
+#include "marray/short_vector.hpp"
 #include <catch2/catch_all.hpp>
 
 #include <list>

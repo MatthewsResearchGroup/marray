@@ -235,15 +235,66 @@ class marray_slice
 #endif
         const marray_slice& operator=(const Expression& other) const
         {
-            assign_expr(*this, other);
+            assign_expr(view(), other);
+            return *this;
+        }
+
+        /**
+         * Set the tensor elements to those of the given tensor or tensor view.
+         *
+         * For a tensor ([marray](@ref MArray::marray)), the instance must not be
+         * const-qualified. For a tensor view ([marray_view](@ref MArray::marray_view)),
+         * the value type must not be const-qualified.
+         *
+         * @param other     A tensor, tensor view, or partially indexed tensor. The dimensions of
+         *                  the tensor must match those of this tensor.
+         *
+         * @return          *this
+         */
+#if MARRAY_DOXYGEN
+        marray_slice& operator=(tensor_or_view other);
+#else
+        template <typename U, int N, typename D, bool O>
+        std::enable_if_t<N == DYNAMIC, marray_slice&>
+        operator=(const marray_base<U, N, D, O>& other)
+        {
+            view() = other;
             return *this;
         }
 
         /* Inherit docs */
-        const marray_slice& operator=(const marray_slice& other) const
+        template <typename U, int N, typename D, bool O>
+        std::enable_if_t<N == DYNAMIC, const marray_slice&>
+        operator=(const marray_base<U, N, D, O>& other) const
+        {
+            view() = other;
+            return *this;
+        }
+
+        /* Inherit docs */
+        template <typename U, int N, int I, typename... D>
+        std::enable_if_t<NewNDim == marray_slice<U, N, I, D...>::NewNDim, marray_slice&>
+        operator=(const marray_slice<U, N, I, D...>& other)
+        {
+            view() = other.view();
+            return *this;
+        }
+
+        /* Inherit docs */
+        template <typename U, int N, int I, typename... D>
+        std::enable_if_t<NewNDim == marray_slice<U, N, I, D...>::NewNDim, const marray_slice&>
+        operator=(const marray_slice<U, N, I, D...>& other) const
+        {
+            view() = other.view();
+            return *this;
+        }
+
+        /* Inherit docs */
+        marray_slice& operator=(const marray_slice& other)
         {
             return operator=<>(other);
         }
+#endif
 
         /**
          * Increment the partially-indexed portion of a tensor or tensor view by the result of an expression
@@ -386,6 +437,7 @@ class marray_slice
         auto operator()(Arg&& arg, Args&&... args) const
 #endif
         {
+
             return (*this)[std::forward<Arg>(arg)](std::forward<Args>(args)...);
         }
 
@@ -495,6 +547,11 @@ class marray_slice
         {
             MARRAY_ASSERT(dim >= 0 && dim < NDim);
             return stride_[dim];
+        }
+
+        constexpr int dimension() const
+        {
+            return NewNDim;
         }
 };
 
