@@ -403,7 +403,7 @@ class marray_slice
 #endif
         {
             i -= base_[NextDim];
-            MARRAY_ASSERT(i >= 0 && i < length(NextDim));
+            MARRAY_ASSERT(i >= 0 && i < len_[NextDim]);
             return data_[i * stride_[NextDim]];
         }
 
@@ -414,7 +414,7 @@ class marray_slice
         {
             static_assert(DimsLeft, "No more dimensions to index");
             i -= base_[NextDim];
-            MARRAY_ASSERT(i >= 0 && i < length(NextDim));
+            MARRAY_ASSERT(i >= 0 && i < len_[NextDim]);
             return {*this, i};
         }
 
@@ -425,7 +425,7 @@ class marray_slice
         {
             static_assert(DimsLeft, "No more dimensions to index");
             x -= base_[NextDim];
-            MARRAY_ASSERT_RANGE_IN(x, 0, length(NextDim));
+            MARRAY_ASSERT_RANGE_IN(x, 0, len_[NextDim]);
             return {*this, x};
         }
 
