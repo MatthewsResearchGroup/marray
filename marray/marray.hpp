@@ -1334,9 +1334,12 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
          * @note         Only available when `NDim != ` [DYNAMIC](@ref MArray::DYNAMIC) or 1.
          */
 #if !MARRAY_DOXYGEN
-        template <int NDim_=NDim, typename=std::enable_if_t<NDim_!=1 && NDim_ != DYNAMIC>,marray&>
+        template <int NDim_=NDim>
+        std::enable_if_t<NDim_!=1 && NDim_ != DYNAMIC, marray&>
+#else
+        marray&
 #endif
-        marray& reset(initializer_type data, layout layout = DEFAULT_LAYOUT)
+        reset(initializer_type data, layout layout = DEFAULT_LAYOUT)
         {
             detail::array_type_t<len_type, NDim> len(NDim);
             base_class::set_lengths_(0, len, data);
