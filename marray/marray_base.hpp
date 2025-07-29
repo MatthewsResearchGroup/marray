@@ -1039,44 +1039,6 @@ class marray_base
         }
 #endif
 
-        /**
-         * Return true if this tensor is the same size and shape and has the same elements
-         * as another tensor.
-         *
-         * @param other     A tensor or tensor view against which to check.
-         *
-         * @return          True if all elements match, false otherwise. If the tensors
-         *                  are not the same size and shape, then false.
-         */
-#if MARRAY_DOXYGEN
-        bool operator==(tensor_or_view other) const;
-#else
-        template <typename U, int N, typename D, bool O>
-        bool operator==(const marray_base<U, N, D, O>& other) const
-        {
-            if (lengths() != other.lengths() || !dimension())
-                return false;
-
-            auto it = make_iterator(lengths(), strides(), other.strides());
-            auto a = data();
-            auto b = other.data();
-            while (it.next(a, b))
-            {
-                if (*a == *b) continue;
-                return false;
-            }
-
-            return true;
-        }
-
-        /* Inherit docs */
-        template <typename U, int N, int I, typename... D>
-        bool operator==(const marray_slice<U, N, I, D...>& other) const
-        {
-            return *this == other.view();
-        }
-#endif
-
         /** @} */
         /***********************************************************************
          *
@@ -2689,6 +2651,50 @@ class marray_base
 
         /** @} */
 };
+
+/**
+ * Return true if a tensor is the same size and shape and has the same elements
+ * as another tensor.
+ *
+ * @param lhs A tensor or tensor view.
+ *
+ * @param rhs A tensor or tensor view against which to check.
+ *
+ * @return    True if all elements match, false otherwise. If the tensors
+ *            are not the same size and shape, then false.
+ */
+#if MARRAY_DOXYGEN
+bool operator==(tensor_or_view lhs, tensor_or_view rhs);
+#else
+template <typename U1, int N1, typename D1, bool O1,
+          typename U2, int N2, typename D2, bool O2>
+bool operator==(const marray_base<U1, N1, D1, O1>& lhs,
+                const marray_base<U2, N2, D2, O2>& rhs)
+{
+    if (lhs.lengths() != rhs.lengths() || !lhs.dimension())
+        return false;
+
+    auto it = make_iterator(lhs.lengths(), lhs.strides(), rhs.strides());
+    auto a = lhs.data();
+    auto b = rhs.data();
+    while (it.next(a, b))
+    {
+        if (*a == *b) continue;
+        return false;
+    }
+
+    return true;
+}
+
+/* Inherit docs */
+template <typename U1, int N1, typename D1, bool O1,
+          typename U2, int N2, int I2, typename... D2>
+bool operator==(const marray_base<U1, N1, D1, O1>& lhs,
+                const marray_slice<U2, N2, I2, D2...>& rhs)
+{
+    return lhs == rhs.view();
+}
+#endif
 
 /**
  * Return an immutable view of the given tensor.
