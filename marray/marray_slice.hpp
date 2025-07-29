@@ -1,6 +1,7 @@
 #ifndef MARRAY_MARRAY_SLICE_HPP
 #define MARRAY_MARRAY_SLICE_HPP
 
+#include <tuple>
 #include <utility>
 
 #include "range.hpp"
