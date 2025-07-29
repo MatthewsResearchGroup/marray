@@ -660,10 +660,10 @@ make_expression_helper(const marray_slice<T, NDim, NIndexed, Dims...>& x,
                        std::integer_sequence<int, J...>)
 {
     return {x.data(), x.template dim<I>()...,
-            slice_dim(x.base(NIndexed+J),
-                      x.length(NIndexed+J),
+            slice_dim(x.base_raw(NIndexed+J),
+                      x.length_raw(NIndexed+J),
                       0,
-                      x.stride(NIndexed+J))...};
+                      x.stride_raw(NIndexed+J))...};
 }
 
 template <typename T, int NDim, typename Derived, bool Owner, int... I>

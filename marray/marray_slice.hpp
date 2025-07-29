@@ -164,6 +164,39 @@ class marray_slice
             return *this;
         }
 
+        template <size_t... I>
+        void bases_(len_type* bases, std::index_sequence<I...> = {}) const
+        {
+            (
+                (bases[I] = base_[dim<I>().dim]),
+                ...
+            );
+
+            std::copy_n(base_+NextDim, DimsLeft, bases+NSliced);
+        }
+
+        template <size_t... I>
+        void lengths_(len_type* len, std::index_sequence<I...> = {}) const
+        {
+            (
+                (len[I] = dim<I>().len),
+                ...
+            );
+
+            std::copy_n(len_+NextDim, DimsLeft, len+NSliced);
+        }
+
+        template <size_t... I>
+        void strides_(stride_type* stride, std::index_sequence<I...> = {}) const
+        {
+            (
+                (stride[I] = dim<I>().stride),
+                ...
+            );
+
+            std::copy_n(stride_+NextDim, DimsLeft, stride+NSliced);
+        }
+
         template <typename T, int N, size_t... I>
         marray_view<T,N> view_(std::index_sequence<I...>) const
         {
@@ -179,18 +212,9 @@ class marray_slice
                 ret.stride_.resize(NewNDim);
             }
 
-            (
-                (
-                    ret.base_[I] = base(dim<I>().dim),
-                    ret.len_[I] = dim<I>().len,
-                    ret.stride_[I] = dim<I>().stride
-                ),
-                ...
-            );
-
-            std::copy_n(base_+NextDim, DimsLeft, ret.base_.begin()+NSliced);
-            std::copy_n(len_+NextDim, DimsLeft, ret.len_.begin()+NSliced);
-            std::copy_n(stride_+NextDim, DimsLeft, ret.stride_.begin()+NSliced);
+            bases_<I...>(ret.base_.data());
+            lengths_<I...>(ret.len_.data());
+            strides_<I...>(ret.stride_.data());
             ret.data_ = data();
 
 #ifdef MARRAY_ENABLE_ASSERTS
@@ -378,9 +402,9 @@ class marray_slice
         operator[](len_type i) const
 #endif
         {
-            i -= base(NextDim);
+            i -= base_[NextDim];
             MARRAY_ASSERT(i >= 0 && i < length(NextDim));
-            return data_[i * stride(NextDim)];
+            return data_[i * stride_[NextDim]];
         }
 
         /* Inherit docs */
@@ -389,7 +413,7 @@ class marray_slice
         operator[](len_type i) const
         {
             static_assert(DimsLeft, "No more dimensions to index");
-            i -= base(NextDim);
+            i -= base_[NextDim];
             MARRAY_ASSERT(i >= 0 && i < length(NextDim));
             return {*this, i};
         }
@@ -400,7 +424,7 @@ class marray_slice
         operator[](range_t<I> x) const
         {
             static_assert(DimsLeft, "No more dimensions to index");
-            x -= base(NextDim);
+            x -= base_[NextDim];
             MARRAY_ASSERT_RANGE_IN(x, 0, length(NextDim));
             return {*this, x};
         }
@@ -410,7 +434,7 @@ class marray_slice
         operator[](all_t) const
         {
             static_assert(DimsLeft, "No more dimensions to index");
-            return {*this, range(length(NIndexed))};
+            return {*this, range(len_[NIndexed])};
         }
 
         /* Inherit docs */
@@ -522,31 +546,66 @@ class marray_slice
             return view().T();
         }
 
-        /*
-         * These should be protected, but can't since some free helper functions in expression.hpp need to use them.
-         */
-
         template <int Dim>
         auto dim() const -> decltype((std::get<Dim>(dims_)))
         {
             return std::get<Dim>(dims_);
         }
 
+        std::array<len_type,NewNDim> bases() const
+        {
+            std::array<len_type,NewNDim> base;
+            bases_(base.data(), std::make_index_sequence<NSliced>{});
+            return base;
+        }
+
+        std::array<len_type,NewNDim> lengths() const
+        {
+            std::array<len_type,NewNDim> len;
+            lengths_(len.data(), std::make_index_sequence<NSliced>{});
+            return len;
+        }
+
+        std::array<stride_type,NewNDim> strides() const
+        {
+            std::array<stride_type,NewNDim> stride;
+            strides_(stride.data(), std::make_index_sequence<NSliced>{});
+            return stride;
+        }
+
         len_type base(int dim) const
         {
-            MARRAY_ASSERT(dim >= 0 && dim < NDim);
-            return base_[dim];
+            MARRAY_ASSERT(dim >= 0 && dim < NewNDim);
+            return bases()[dim];
         }
 
         len_type length(int dim) const
         {
-            MARRAY_ASSERT(dim >= 0 && dim < NDim);
-            return len_[dim];
+            MARRAY_ASSERT(dim >= 0 && dim < NewNDim);
+            return lengths()[dim];
         }
 
         stride_type stride(int dim) const
         {
-            MARRAY_ASSERT(dim >= 0 && dim < NDim);
+            MARRAY_ASSERT(dim >= 0 && dim < NewNDim);
+            return strides()[dim];
+        }
+
+        len_type base_raw(int dim) const
+        {
+            MARRAY_ASSERT(dim >= NIndexed && dim < NDim);
+            return base_[dim];
+        }
+
+        len_type length_raw(int dim) const
+        {
+            MARRAY_ASSERT(dim >= NIndexed && dim < NDim);
+            return len_[dim];
+        }
+
+        stride_type stride_raw(int dim) const
+        {
+            MARRAY_ASSERT(dim >= NIndexed && dim < NDim);
             return stride_[dim];
         }
 

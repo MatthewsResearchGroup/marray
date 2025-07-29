@@ -999,6 +999,111 @@ TEST_CASE("varray::access")
     CHECK(v5.data() == v1.data() + 1);
 }
 
+TEST_CASE("marray::slice")
+{
+    array<double,12> data = { 0, 1, 2,
+                              3, 4, 5,
+                              6, 7, 8,
+                              9,10,11};
+
+    marray<double,2> v1(marray_view<const double,2>({4, 3}, data.data()));
+
+    CHECK(v1(0, 0) ==  0);
+    CHECK(v1(1, 2) ==  5);
+    CHECK(v1(3, 1) == 10);
+    CHECK(std::as_const(v1)(3, 1) == 10);
+
+    CHECK(v1[0][0] ==  0);
+    CHECK(v1[1][2] ==  5);
+    CHECK(v1[3][1] == 10);
+    CHECK(std::as_const(v1)[3][1] == 10);
+
+    auto v2 = v1(slice::all, range(2));
+    CHECK(v2.lengths() == array<len_type,2>{4, 2});
+    CHECK(v2.strides() == array<stride_type,2>{3, 1});
+    CHECK(v2.data() == v1.data());
+
+    auto v3 = v1(range(0, 4, 2), 1);
+    CHECK(v3.lengths() == array<len_type,1>{2});
+    CHECK(v3.strides() == array<stride_type,1>{6});
+    CHECK(v3.data() == v1.data() + 1);
+
+    auto v4 = v1[slice::all][range(2)];
+    CHECK(v4.lengths() == array<len_type,2>{4, 2});
+    CHECK(v4.strides() == array<stride_type,2>{3, 1});
+    CHECK(v4.data() == v1.data());
+
+    auto v5 = v1[range(1,3)];
+    CHECK(v5.lengths() == array<len_type,2>{2,3});
+    CHECK(v5.strides() == array<stride_type,2>{3,1});
+    CHECK(v5.data() == v1.data() + 3);
+
+    auto v6 = v1[2];
+    CHECK(v6.lengths() == array<len_type,1>{3});
+    CHECK(v6.strides() == array<stride_type,1>{1});
+    CHECK(v6.data() == v1.data() + 6);
+
+    auto v7 = std::as_const(v1)(slice::all, range(2));
+    CHECK(v7.lengths() == array<len_type,2>{4, 2});
+    CHECK(v7.strides() == array<stride_type,2>{3, 1});
+    CHECK(v7.data() == v1.data());
+
+    auto v8 = std::as_const(v1)(range(0, 4, 2), 1);
+    CHECK(v8.lengths() == array<len_type,1>{2});
+    CHECK(v8.strides() == array<stride_type,1>{6});
+    CHECK(v8.data() == v1.data() + 1);
+
+    auto v9 = std::as_const(v1)[slice::all][range(2)];
+    CHECK(v9.lengths() == array<len_type,2>{4, 2});
+    CHECK(v9.strides() == array<stride_type,2>{3, 1});
+    CHECK(v9.data() == v1.data());
+
+    auto v10 = std::as_const(v1)[range(1,3)];
+    CHECK(v10.lengths() == array<len_type,2>{2,3});
+    CHECK(v10.strides() == array<stride_type,2>{3,1});
+    CHECK(v10.data() == v1.data() + 3);
+
+    auto v11 = std::as_const(v1)[2];
+    CHECK(v11.lengths() == array<len_type,1>{3});
+    CHECK(v11.strides() == array<stride_type,1>{1});
+    CHECK(v11.data() == v1.data() + 6);
+}
+
+TEST_CASE("varray::slice")
+{
+    array<double,12> data = { 0, 1, 2,
+                              3, 4, 5,
+                              6, 7, 8,
+                              9,10,11};
+
+    marray<double> v1(marray_view<const double>({4, 3}, data.data()));
+
+    CHECK(v1(0, 0) ==  0);
+    CHECK(v1(1, 2) ==  5);
+    CHECK(v1(3, 1) == 10);
+    CHECK(std::as_const(v1)(3, 1) == 10);
+
+    auto v2 = v1(slice::all, range(2));
+    CHECK(v2.lengths() == array<len_type,2>{4, 2});
+    CHECK(v2.strides() == array<stride_type,2>{3, 1});
+    CHECK(v2.data() == v1.data());
+
+    auto v3 = v1(range(0, 4, 2), 1);
+    CHECK(v3.lengths() == array<len_type,1>{2});
+    CHECK(v3.strides() == array<stride_type,1>{6});
+    CHECK(v3.data() == v1.data() + 1);
+
+    auto v4 = std::as_const(v1)(slice::all, range(2));
+    CHECK(v4.lengths() == array<len_type,2>{4, 2});
+    CHECK(v4.strides() == array<stride_type,2>{3, 1});
+    CHECK(v4.data() == v1.data());
+
+    auto v5 = std::as_const(v1)(range(0, 4, 2), 1);
+    CHECK(v5.lengths() == array<len_type,1>{2});
+    CHECK(v5.strides() == array<stride_type,1>{6});
+    CHECK(v5.data() == v1.data() + 1);
+}
+
 TEST_CASE("marray::iteration")
 {
     array<array<int,3>,4> visited;
