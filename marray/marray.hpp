@@ -46,6 +46,8 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
          */
         marray() {}
 
+#ifndef MARRAY_DISABLE_VECTOR_CONSTRUCTOR
+
         /**
          * Construct a tensor by copying a std::vector of compatible type.
          *
@@ -64,6 +66,8 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
         {
             reset(v);
         }
+
+#endif //MARRAY_DISABLE_VECTOR_CONSTRUCTOR
 
         /**
          * Copy constructor.
@@ -776,6 +780,8 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
             return *this;
         }
 
+#ifndef MARRAY_DISABLE_VECTOR_CONSTRUCTOR
+
         /**
          * Re-initialize the tensor by copying a std::vector of compatible type.
          *
@@ -797,6 +803,8 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
         {
             return reset(marray_view<const T,1>{v});
         }
+
+#endif //MARRAY_DISABLE_VECTOR_CONSTRUCTOR
 
         /**
          * Re-initialize the tensor by copying another tensor or tensor view.
