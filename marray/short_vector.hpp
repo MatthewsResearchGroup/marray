@@ -504,10 +504,31 @@ class short_vector
                    std::equal(begin(), end(), other.begin());
         }
 
-        auto operator<=>(const short_vector& other) const
+        bool operator!=(const short_vector& other) const
         {
-            return std::lexicographical_compare_three_way(begin(), end(),
+            return size() != other.size() ||
+                   !std::equal(begin(), end(), other.begin());
+        }
+
+        auto operator<(const short_vector& other) const
+        {
+            return std::lexicographical_compare(begin(), end(),
                                                           other.begin(), other.end());
+        }
+
+        auto operator>(const short_vector& other) const
+        {
+            return other < *this;
+        }
+
+        auto operator<=(const short_vector& other) const
+        {
+            return !(other < *this);
+        }
+
+        auto operator>=(const short_vector& other) const
+        {
+            return !(*this < other);
         }
 
     protected:
