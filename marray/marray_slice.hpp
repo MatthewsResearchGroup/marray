@@ -26,6 +26,9 @@ struct slice_dim
     : dim(dim), len(len), off(off), stride(stride) {}
 };
 
+namespace MARRAY_INNER_NAMESPACE
+{
+
 template <typename Type, int NDim, int NIndexed, typename... Dims>
 class marray_slice
 {
@@ -615,6 +618,8 @@ class marray_slice
         }
 };
 
-}
+} //MARRAY_INNER_NAMESPACE
+
+} //MArray
 
 #endif //MARRAY_MARRAY_SLICE_HPP

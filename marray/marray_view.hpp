@@ -6,6 +6,8 @@
 
 namespace MArray
 {
+namespace MARRAY_INNER_NAMESPACE
+{
 
 template <typename Type, int NDim>
 class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, false>
@@ -892,6 +894,8 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
         /** @} */
 };
 
+} //MARRAY_INNER_NAMESPACE
+
 /**
  * Swap two views.
  *
@@ -907,6 +911,6 @@ void swap(marray_view<Type, NDim>& a, marray_view<Type, NDim>& b)
     a.swap(b);
 }
 
-}
+} //MArray
 
 #endif //MARRAY_MARRAY_VIEW_HPP

@@ -646,3 +646,4 @@ auto reversed_rangeN(T to, U N, V delta)
 } // namespace MArray
 
 #endif //MARRAY_RANGE_HPP
+

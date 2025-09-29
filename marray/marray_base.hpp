@@ -136,6 +136,9 @@ struct base_like : protected array_1d<len_type>
 
 }
 
+namespace MARRAY_INNER_NAMESPACE
+{
+
 template <typename Type, int NDim, typename Derived, bool Owner>
 class marray_base
 {
@@ -2652,6 +2655,8 @@ class marray_base
         /** @} */
 };
 
+} //MARRAY_INNER_NAMESPACE
+
 /**
  * Return true if a tensor is the same size and shape and has the same elements
  * as another tensor.
@@ -2877,6 +2882,6 @@ std::ostream& operator<<(std::ostream& os, const marray_slice<Type, NDim, NIndex
     return os << x.view();
 }
 
-}
+} //MArray
 
 #endif //MARRAY_MARRAY_BASE_HPP

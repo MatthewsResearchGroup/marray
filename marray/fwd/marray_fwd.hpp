@@ -6,8 +6,18 @@
 
 #include "../types.hpp"
 
+#if MARRAY_DEBUG
+#define MARRAY_INNER_NAMESPACE debug
+#else
+#define MARRAY_INNER_NAMESPACE release
+#endif
+
 namespace MArray
 {
+
+namespace MARRAY_INNER_NAMESPACE
+{
+
 /**
  * A partially-indexed tensor.
  *
@@ -62,6 +72,13 @@ class marray_view;
  */
 template <typename Type, int NDim=DYNAMIC, typename Allocator=std::allocator<Type>>
 class marray;
+
+} //MARRAY_INNER_NAMESPACE
+
+using MARRAY_INNER_NAMESPACE::marray_slice;
+using MARRAY_INNER_NAMESPACE::marray_base;
+using MARRAY_INNER_NAMESPACE::marray_view;
+using MARRAY_INNER_NAMESPACE::marray;
 
 /**
  * Alias for a 1-dimensional tensor view.

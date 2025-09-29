@@ -6,6 +6,9 @@
 namespace MArray
 {
 
+namespace MARRAY_INNER_NAMESPACE
+{
+
 template <typename Type, int NDim, typename Allocator>
 class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, true>
 {
@@ -1561,6 +1564,8 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
         /** @} */
 };
 
+} //MARRAY_INNER_NAMESPACE
+
 /**
  * Swap the shape, data, and layout of two tensors
  *
@@ -1576,6 +1581,6 @@ void swap(marray<Type, NDim, Allocator>& a, marray<Type, NDim, Allocator>& b)
     a.swap(b);
 }
 
-}
+} //MArray
 
 #endif //MARRAY_MARRAY_HPP
