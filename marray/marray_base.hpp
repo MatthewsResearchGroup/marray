@@ -2215,6 +2215,30 @@ class marray_base
             MARRAY_ASSERT(i >= 0 && i < length(0));
             return {*this, i};
         }
+
+        /* Inherit docs */
+        template <typename=void, int N=NDim>
+        std::enable_if_t<N==DYNAMIC, marray_view<Type, DYNAMIC>>
+        operator[](len_type i)
+        {
+            i -= base(0);
+            MARRAY_ASSERT(i >= 0 && i < length(0));
+            MARRAY_ASSERT(dimension() > 1);
+
+            len_vector lengths(len_.begin()+1, len_.end());
+            len_vector strides(stride_.begin()+1, stride_.end());
+            auto ptr = data() + i*stride(0);
+
+            return {lengths, ptr, strides};
+        }
+
+        /* Inherit docs */
+        template <typename=void, int N=NDim>
+        std::enable_if_t<N==DYNAMIC, marray_view<ctype, DYNAMIC>>
+        operator[](len_type i) const
+        {
+            return const_cast<marray_base&>(*this)[i];
+        }
 #endif
 
         /**
