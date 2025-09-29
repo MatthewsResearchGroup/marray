@@ -49,7 +49,7 @@ class marray_slice
         const len_type* base_;
         const len_type* len_;
         const stride_type* stride_;
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
         const_pointer bbox_data_;
         const len_type* bbox_len_;
         const len_type* bbox_off_;
@@ -71,7 +71,7 @@ class marray_slice
           base_(array.bases().data()),
           len_(array.lengths().data()),
           stride_(array.strides().data()),
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
           bbox_data_(array.bbox_data_),
           bbox_len_(array.bbox_len_.data()),
           bbox_off_(array.bbox_off_.data()),
@@ -86,7 +86,7 @@ class marray_slice
           base_(array.bases().data()),
           len_(array.lengths().data()),
           stride_(array.strides().data()),
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
           bbox_data_(array.bbox_data_),
           bbox_len_(array.bbox_len_.data()),
           bbox_off_(array.bbox_off_.data()),
@@ -104,7 +104,7 @@ class marray_slice
           base_(array.bases().data()),
           len_(array.lengths().data()),
           stride_(array.strides().data()),
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
           bbox_data_(array.bbox_data_),
           bbox_len_(array.bbox_len_.data()),
           bbox_off_(array.bbox_off_.data()),
@@ -118,7 +118,7 @@ class marray_slice
           base_(parent.base_),
           len_(parent.len_),
           stride_(parent.stride_),
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
           bbox_data_(parent.bbox_data_),
           bbox_len_(parent.bbox_len_),
           bbox_off_(parent.bbox_off_),
@@ -133,7 +133,7 @@ class marray_slice
           base_(parent.base_),
           len_(parent.len_),
           stride_(parent.stride_),
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
           bbox_data_(parent.bbox_data_),
           bbox_len_(parent.bbox_len_),
           bbox_off_(parent.bbox_off_),
@@ -153,7 +153,7 @@ class marray_slice
           base_(parent.base_),
           len_(parent.len_),
           stride_(parent.stride_),
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
           bbox_data_(parent.bbox_data_),
           bbox_len_(parent.bbox_len_),
           bbox_off_(parent.bbox_off_),
@@ -220,7 +220,7 @@ class marray_slice
             strides_<I...>(ret.stride_.data());
             ret.data_ = data();
 
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
 
             if constexpr (N == DYNAMIC)
             {

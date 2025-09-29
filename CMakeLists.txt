@@ -29,6 +29,7 @@ option(ENABLE_TESTS "Enable building unit tests." OFF)
 option(ENABLE_COVERAGE "Enable code coverage reporting for tests (requires clang)." OFF)
 
 set(MARRAY_HEADERS
+    marray/detail/config.hpp
     marray/detail/utility.hpp
     marray/detail/vector_avx.hpp
     marray/detail/vector_avx512.hpp
@@ -205,7 +206,6 @@ if(ENABLE_TESTS)
                     "${INCLUDE_LIST}"
                     "-I${CMAKE_CURRENT_SOURCE_DIR}"
                     "${CATCH2_CFLAGS}"
-	                -DMARRAY_ENABLE_ASSERTS
                     > "${PROCESSED_DIR}/${file}"
                 COMMAND_EXPAND_LISTS
                 DEPENDS ${file} force-cover-build
@@ -224,7 +224,6 @@ if(ENABLE_TESTS)
                     "${INCLUDE_LIST}"
                     "-I${CMAKE_CURRENT_SOURCE_DIR}"
                     "${CATCH2_CFLAGS}"
-	                -DMARRAY_ENABLE_ASSERTS
                     > "${PROCESSED_DIR}/${file}"
                 COMMAND_EXPAND_LISTS
                 DEPENDS ${file} force-cover-build ${PROCESSED_HEADERS}

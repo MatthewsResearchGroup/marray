@@ -127,7 +127,7 @@ using ptr_vector         = short_vector<T*,MARRAY_OPT_NDIM>;
  *
  * @ingroup macros
  */
-#define MARRAY_ENABLE_ASSERTS
+#define MARRAY_DEBUG 1
 #endif
 
 #ifndef MARRAY_DEFAULT_LAYOUT

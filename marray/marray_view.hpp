@@ -25,7 +25,7 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
         using base_class::stride_;
         using base_class::data_;
 
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
         using base_class::bbox_len_;
         using base_class::bbox_off_;
         using base_class::bbox_stride_;
@@ -531,7 +531,7 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
             MARRAY_ASSERT(dim >= 0 && dim < dimension());
             data_ += n * stride(dim);
 
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
             bbox_off_[dim] += n * stride(dim) / bbox_stride_[dim];
             MARRAY_ASSERT(bbox_off_[dim] >= 0);
             MARRAY_ASSERT(bbox_off_[dim] + length(dim) * std::abs(stride(dim)) / bbox_stride_[dim] <= bbox_len_[dim]);
@@ -558,7 +558,7 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
             data_ += n * stride(dim);
             len_[dim] = len;
 
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
             bbox_off_[dim] += n * stride(dim) / bbox_stride_[dim];
             MARRAY_ASSERT(bbox_off_[dim] >= 0);
             MARRAY_ASSERT(bbox_off_[dim] + length(dim) * std::abs(stride(dim)) / bbox_stride_[dim] <= bbox_len_[dim]);
@@ -655,7 +655,7 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
             dim_vector perm_;
             perm.slurp(perm_);
 
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
             auto bbox_len = bbox_len_;
             auto bbox_off = bbox_off_;
             auto bbox_stride = bbox_stride_;
@@ -670,7 +670,7 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
                 len_[i] = len[perm_[i]];
                 stride_[i] = stride[perm_[i]];
 
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
                 bbox_len_[i] = bbox_len[perm_[i]];
                 bbox_off_[i] = bbox_off[perm_[i]];
                 bbox_stride_[i] = bbox_stride[perm_[i]];
@@ -827,7 +827,7 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
             MARRAY_ASSERT(dim >= 0 && dim < dimension());
             MARRAY_ASSERT(len >= 0);
             std::swap(len, len_[dim]);
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
             MARRAY_ASSERT(bbox_off_[dim] + length(dim) * std::abs(stride(dim)) / bbox_stride_[dim] <= bbox_len_[dim]);
 #endif
             return len;
@@ -866,7 +866,7 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
         {
             MARRAY_ASSERT(dim >= 0 && dim < dimension());
             std::swap(str, stride_[dim]);
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
             MARRAY_ASSERT(std::abs(stride(dim)) % bbox_stride_[dim] == 0);
             MARRAY_ASSERT(bbox_off_[dim] + length(dim) * std::abs(stride(dim)) / bbox_stride_[dim] <= bbox_len_[dim]);
 #endif

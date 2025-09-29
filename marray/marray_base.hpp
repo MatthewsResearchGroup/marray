@@ -195,7 +195,7 @@ class marray_base
         detail::array_type_t<stride_type, NDim> stride_ = {};
         pointer data_ = nullptr;
 
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
 
         detail::array_type_t<len_type, NDim> bbox_len_ = {};
         detail::array_type_t<len_type, NDim> bbox_off_ = {};
@@ -656,7 +656,7 @@ class marray_base
         void swap(marray_base& other)
         {
             using std::swap;
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
             swap(bbox_data_, other.bbox_data_);
             swap(bbox_len_, other.bbox_len_);
             swap(bbox_off_, other.bbox_off_);
