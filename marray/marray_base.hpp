@@ -1615,9 +1615,7 @@ class marray_base
 #endif
 
         /**
-         * Return a transposed view.
-         *
-         * This overload is only available for matrices and matrix views (`NDim == 2`).
+         * Return a transposed view, that is, a view with the order of dimensions reversed.
          *
          * @return      A possibly-mutable tensor view. For a tensor
          *              ([marray](@ref MArray::marray)), the returned view is
@@ -1629,26 +1627,31 @@ class marray_base
 #if MARRAY_DOXYGEN
         possibly_mutable_view transposed();
 #else
-        template <typename=void, int N=NDim>
-        std::enable_if_t<N==2,marray_view<Type, NDim>>
-        transposed()
+        marray_view<Type, NDim> transposed()
         {
-            return permuted({1, 0});
+            if constexpr (NDim != DYNAMIC)
+            {
+              std::array<int,NDim> dims;
+              for (auto i : range(NDim))
+                dims[i] = NDim-i-1;
+              return permuted(dims);
+            }
+            else
+            {
+              dim_vector dims = reversed_range(dimension());
+              return permuted(dims);
+            }
         }
 
         /* Inherit docs */
-        template <typename=void, int N=NDim>
-        std::enable_if_t<N==2,marray_view<ctype, NDim>>
-        transposed() const
+        marray_view<ctype, NDim> transposed() const
         {
             return const_cast<marray_base&>(*this).transposed();
         }
 #endif
 
         /**
-         * Return a transposed view.
-         *
-         * This overload is only available for matrices and matrix views (`NDim == 2`).
+         * Return a transposed view, that is, a view with the order of dimensions reversed.
          *
          * @return      A possibly-mutable tensor view. For a tensor
          *              ([marray](@ref MArray::marray)), the returned view is
@@ -1660,17 +1663,13 @@ class marray_base
 #if MARRAY_DOXYGEN
         possibly_mutable_view T();
 #else
-        template <typename=void, int N=NDim>
-        std::enable_if_t<N==2,marray_view<Type, NDim>>
-        T()
+        marray_view<Type, NDim> T()
         {
             return transposed();
         }
 
         /* Inherit docs */
-        template <typename=void, int N=NDim>
-        std::enable_if_t<N==2,marray_view<ctype, NDim>>
-        T() const
+        marray_view<ctype, NDim> T() const
         {
             return const_cast<marray_base&>(*this).T();
         }
