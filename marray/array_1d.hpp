@@ -138,7 +138,9 @@ class array_1d
 
             virtual void slurp(T* x) const override
             {
-                std::copy_n(data.begin(), len, x);
+                auto y = data.begin();
+                if (len && y && x)
+                    std::copy_n(y, len, x);
             }
 
             virtual adaptor_base& copy(adaptor_base& other) override
