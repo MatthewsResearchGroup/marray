@@ -17,7 +17,7 @@ jobs:
           command: './configure CC=clang CXX=clang++ --enable-tests --enable-coverage'
       - run:
           name: Building
-          command: 'make -j2'
+          command: 'make -j2 VERBOSE=1'
       - run:
           name: Unit Testing
           command: './bin/run_tests.sh'
