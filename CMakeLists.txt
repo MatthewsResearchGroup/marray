@@ -88,6 +88,7 @@ if(ENABLE_TESTS)
     FetchContent_MakeAvailable(Catch2)
 
     get_target_property(CATCH2_INCLUDES Catch2::Catch2 INTERFACE_INCLUDE_DIRECTORIES)
+    list(REMOVE_ITEM CATCH2_INCLUDES "")
     set(CATCH2_CFLAGS "$<LIST:TRANSFORM,${CATCH2_INCLUDES},PREPEND,-I>")
 
     if(ENABLE_COVERAGE)
