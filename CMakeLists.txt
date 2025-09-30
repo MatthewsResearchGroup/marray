@@ -88,9 +88,10 @@ if(ENABLE_TESTS)
     FetchContent_MakeAvailable(Catch2)
 
     get_target_property(CATCH2_INCLUDES Catch2::Catch2 INTERFACE_INCLUDE_DIRECTORIES)
-    string(REGEX REPLACE "^;" "" CATCH2_INCLUDES "${CATCH2_INCLUDES}")
-    string(REGEX REPLACE ";;" "" CATCH2_INCLUDES "${CATCH2_INCLUDES}")
-    string(REGEX REPLACE ";$" "" CATCH2_INCLUDES "${CATCH2_INCLUDES}")
+    # For some reason there is an empty entry at the end of the list, and all
+    # other attempts to get rid of it do not work. If this empty entry ever goes
+    # away then this will be wrong.
+    list(POP_BACK CATCH2_INCLUDES)
     set(CATCH2_CFLAGS "$<LIST:TRANSFORM,${CATCH2_INCLUDES},PREPEND,-I>")
 
     if(ENABLE_COVERAGE)
