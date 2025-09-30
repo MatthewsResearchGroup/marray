@@ -8,8 +8,8 @@
 
 #include "detail/utility.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
+
 namespace detail
 {
 
@@ -139,8 +139,7 @@ class array_1d
             virtual void slurp(T* x) const override
             {
                 auto y = data.begin();
-                if (len && y && x)
-                    std::copy_n(y, len, x);
+                std::copy_n(y, len, x);
             }
 
             virtual adaptor_base& copy(adaptor_base& other) override
@@ -215,6 +214,6 @@ class array_1d
         len_type size() const { return adaptor_.len; }
 };
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_ARRAY_1D_HPP

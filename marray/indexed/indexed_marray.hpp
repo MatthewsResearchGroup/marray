@@ -3,8 +3,7 @@
 
 #include "indexed_marray_view.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <typename Type, typename Allocator>
 class indexed_marray : public indexed_marray_base<Type, indexed_marray<Type, Allocator>, true>
@@ -242,6 +241,6 @@ class indexed_marray : public indexed_marray_base<Type, indexed_marray<Type, All
         }
 };
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_INDEXED_MARRAY_HPP

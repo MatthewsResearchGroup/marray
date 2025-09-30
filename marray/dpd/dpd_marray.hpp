@@ -3,8 +3,7 @@
 
 #include "dpd_marray_view.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <typename Type, typename Allocator>
 class dpd_marray : public dpd_marray_base<Type, dpd_marray<Type, Allocator>, true>
@@ -289,6 +288,6 @@ class dpd_marray : public dpd_marray_base<Type, dpd_marray<Type, Allocator>, tru
         }
 };
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_DPD_MARRAY_HPP

@@ -10,8 +10,7 @@
 
 #include "detail/config.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <typename T, size_t N, typename Allocator=std::allocator<T>>
 class short_vector
@@ -802,6 +801,6 @@ class short_vector
         };
 };
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_SHORT_VECTOR_HPP

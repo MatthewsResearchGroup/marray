@@ -3,8 +3,7 @@
 
 #include "indexed_dpd_marray_base.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <typename Type>
 class indexed_dpd_marray_view : public indexed_dpd_marray_base<Type, indexed_dpd_marray_view<Type>, false>
@@ -190,6 +189,6 @@ class indexed_dpd_marray_view : public indexed_dpd_marray_base<Type, indexed_dpd
         }
 };
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_INDEXED_DPD_MARRAY_VIEW_HPP

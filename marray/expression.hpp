@@ -5,8 +5,7 @@
 #include "detail/vector.hpp"
 #include "fwd/expression_fwd.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <typename Expr, typename=void> struct expression_type;
 template <typename Expr, typename=void> struct expr_dimension;
@@ -1502,6 +1501,6 @@ marray<Type,NDim,Allocator>::marray(const Expression& other)
     assign_expr(*this, other);
 }
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_EXPRESSION_HPP

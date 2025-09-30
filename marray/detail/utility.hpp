@@ -9,8 +9,7 @@
 #include "../types.hpp"
 #include "../fwd/marray_fwd.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 struct all_t;
 struct bcast_t;
@@ -447,7 +446,8 @@ void assign(std::array<T, N>& lhs, const C&... rhs)
     assign_helper<0>(lhs, rhs...);
 }
 
-}
-}
+} //namespace detail
+
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_UTILITY_HPP

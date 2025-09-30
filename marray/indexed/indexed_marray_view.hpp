@@ -3,8 +3,7 @@
 
 #include "indexed_marray_base.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <typename Type>
 class indexed_marray_view : public indexed_marray_base<Type, indexed_marray_view<Type>, false>
@@ -142,6 +141,6 @@ class indexed_marray_view : public indexed_marray_base<Type, indexed_marray_view
         }
 };
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_INDEXED_MARRAY_VIEW_HPP

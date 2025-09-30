@@ -17,8 +17,7 @@
 /** @defgroup funcs Global Functions */
 
 /** Main MArray namespace. */
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 struct all_t { constexpr all_t() {} };
 struct bcast_t { constexpr bcast_t() {} };
@@ -190,6 +189,6 @@ constexpr int DYNAMIC;
 constexpr int DYNAMIC = -1;
 #endif
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_TYPES_HPP

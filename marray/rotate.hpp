@@ -3,8 +3,7 @@
 
 #include "marray.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <typename T, int N>
 void rotate(const marray_view<T, N>& array, const array_1d<len_type>& shift)
@@ -94,6 +93,6 @@ void rotate(const marray_slice<T, N, I, D...>& array, int dim, len_type shift)
     rotate(array.view(), dim, shift);
 }
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_ROTATE_HPP

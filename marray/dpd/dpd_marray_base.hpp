@@ -7,8 +7,7 @@
 #include <limits>
 #include <climits>
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 struct dpd_layout
 {
@@ -1094,6 +1093,6 @@ class dpd_marray_base : protected detail::dpd_base
         }
 };
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_DPD_marray_BASE_HPP

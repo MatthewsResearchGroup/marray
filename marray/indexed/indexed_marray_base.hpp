@@ -4,8 +4,7 @@
 #include "../marray.hpp"
 #include "../array_2d.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <typename Type, typename Derived, bool Owner>
 class indexed_marray_base;
@@ -598,6 +597,6 @@ class indexed_marray_base
         }
 };
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_INDEXED_MARRAY_BASE_HPP

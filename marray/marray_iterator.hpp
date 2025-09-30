@@ -3,8 +3,7 @@
 
 #include "types.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <typename Array>
 class marray_iterator
@@ -131,6 +130,6 @@ class marray_iterator
         }
 };
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_MARRAY_ITERATOR_HPP

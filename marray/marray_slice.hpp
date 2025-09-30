@@ -4,14 +4,14 @@
 #include <tuple>
 #include <utility>
 
+#include "types.hpp"
 #include "range.hpp"
 #include "marray_iterator.hpp"
 
 #include "fwd/expression_fwd.hpp"
 #include "fwd/marray_fwd.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 struct bcast_dim {};
 
@@ -25,9 +25,6 @@ struct slice_dim
     slice_dim(int dim, len_type len, len_type off, stride_type stride)
     : dim(dim), len(len), off(off), stride(stride) {}
 };
-
-namespace MARRAY_INNER_NAMESPACE
-{
 
 template <typename Type, int NDim, int NIndexed, typename... Dims>
 class marray_slice
@@ -618,8 +615,6 @@ class marray_slice
         }
 };
 
-} //MARRAY_INNER_NAMESPACE
-
-} //MArray
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_MARRAY_SLICE_HPP
