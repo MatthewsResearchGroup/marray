@@ -256,6 +256,7 @@ if(ENABLE_TESTS)
 endif()
 
 add_library(marray INTERFACE)
+add_library(MArray::marray ALIAS marray)
 target_include_directories(marray INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:${INSTALL_INCLUDEDIR}>
@@ -281,6 +282,11 @@ write_basic_package_version_file(
 
 install(FILES "MArrayConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/MArrayConfigVersion.cmake"
     DESTINATION ${INSTALL_LIBDIR}/cmake/MArray
+)
+
+export(EXPORT marray-targets
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/MArrayTargets.cmake
+    NAMESPACE MArray::
 )
 
 find_program(SPHINX sphinx-build)
