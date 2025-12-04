@@ -4,6 +4,7 @@
 
 using namespace std;
 using namespace MArray;
+using namespace MArray::slice;
 
 TEST_CASE("marray::constructor")
 {
@@ -345,12 +346,16 @@ TEST_CASE("varray::reset")
     CHECK(v1.strides() == stride_vector{10, 5, 1});
     CHECK(v1.data()[0] == 1);
 
+    v1.reset();
+    CHECK(v1.dimension() == 0u);
+    CHECK(v1.data() == nullptr);
+
     v1.reset(marray<double>{4, 2, 5});
     CHECK(v1.dimension() == 3u);
     CHECK(v1.lengths() == len_vector{4, 2, 5});
     CHECK(v1.strides() == stride_vector{10, 5, 1});
 
-    v1.reset();
+    v1.reset(marray<double>{});
     CHECK(v1.dimension() == 0u);
     CHECK(v1.data() == nullptr);
 }
@@ -489,6 +494,14 @@ TEST_CASE("varray::resize")
     CHECK(*(array<double,12>*)v1.data() == array<double,12>{0, 1, 1, 1,
                                                             3, 4, 1, 1,
                                                             1, 1, 1, 1});
+
+    v1.reset();
+    v1.resize({2, 2}, 1);
+    CHECK(v1.lengths() == len_vector{2, 2});
+    CHECK(v1.strides() == stride_vector{2, 1});
+    CHECK(v1.bases() == len_vector{0, 0});
+    CHECK(*(array<double,4>*)v1.data() == array<double,4>{1, 1,
+                                                          1, 1});
 }
 
 TEST_CASE("marray::push_pop")
@@ -745,6 +758,86 @@ TEST_CASE("varray::lowered")
     CHECK(v5.lengths() == array<len_type,3>{4, 2, 5});
     CHECK(v5.strides() == array<stride_type,3>{10, 5, 1});
     CHECK(v2.data() == v1.data());
+}
+
+TEST_CASE("marray::reshaped")
+{
+    marray<double,3> v1{4, 2, 5};
+
+    auto v2 = v1.reshaped({2, 2, 2, 5});
+    CHECK(v2.lengths() == len_vector{2, 2, 2, 5});
+    CHECK(v2.strides() == stride_vector{20, 10, 5, 1});
+    CHECK(v2.data() == v1.data());
+
+    auto v3 = v1.reshaped(vector<int>{1, 4, 1, 1, 2, 5});
+    CHECK(v3.lengths() == len_vector{1, 4, 1, 1, 2, 5});
+    CHECK(v3.stride(1) == 10);
+    CHECK(v3.stride(4) == 5);
+    CHECK(v3.stride(5) == 1);
+    CHECK(v3.data() == v1.data());
+
+    auto v3b = v1.reshaped(4, 10);
+    CHECK(v3b.lengths() == array<len_type,2>{4, 10});
+    CHECK(v3b.strides() == array<stride_type,2>{10, 1});
+    CHECK(v3b.data() == v1.data());
+
+    auto v3c = v1.reshaped(4, 5, 2);
+    CHECK(v3c.lengths() == array<len_type,3>{4, 5, 2});
+    CHECK(v3c.strides() == array<stride_type,3>{10, 2, 1});
+    CHECK(v3c.data() == v1.data());
+
+    auto v4 = v1.reshaped(40);
+    CHECK(v4.lengths() == array<len_type,1>{40});
+    CHECK(v4.strides() == array<stride_type,1>{1});
+    CHECK(v4.data() == v1.data());
+
+    auto v5 = std::as_const(v1).reshaped(4, 2, 5);
+    CHECK(v5.lengths() == array<len_type,3>{4, 2, 5});
+    CHECK(v5.strides() == array<stride_type,3>{10, 5, 1});
+    CHECK(v2.data() == v1.data());
+
+    auto v6 = v1(all, range(0), all).view().reshaped(0, 4, 2, 5, 11);
+    CHECK(v6.lengths() == array<len_type,5>{0, 4, 2, 5, 11});
+}
+
+TEST_CASE("varray::reshaped")
+{
+    marray<double> v1{4, 2, 5};
+
+    auto v2 = v1.reshaped({2, 2, 2, 5});
+    CHECK(v2.lengths() == len_vector{2, 2, 2, 5});
+    CHECK(v2.strides() == stride_vector{20, 10, 5, 1});
+    CHECK(v2.data() == v1.data());
+
+    auto v3 = v1.reshaped(vector<int>{1, 4, 1, 1, 2, 5});
+    CHECK(v3.lengths() == len_vector{1, 4, 1, 1, 2, 5});
+    CHECK(v3.stride(1) == 10);
+    CHECK(v3.stride(4) == 5);
+    CHECK(v3.stride(5) == 1);
+    CHECK(v3.data() == v1.data());
+
+    auto v3b = v1.reshaped(4, 10);
+    CHECK(v3b.lengths() == array<len_type,2>{4, 10});
+    CHECK(v3b.strides() == array<stride_type,2>{10, 1});
+    CHECK(v3b.data() == v1.data());
+
+    auto v3c = v1.reshaped(4, 5, 2);
+    CHECK(v3c.lengths() == array<len_type,3>{4, 5, 2});
+    CHECK(v3c.strides() == array<stride_type,3>{10, 2, 1});
+    CHECK(v3c.data() == v1.data());
+
+    auto v4 = v1.reshaped(40);
+    CHECK(v4.lengths() == array<len_type,1>{40});
+    CHECK(v4.strides() == array<stride_type,1>{1});
+    CHECK(v4.data() == v1.data());
+
+    auto v5 = std::as_const(v1).reshaped(4, 2, 5);
+    CHECK(v5.lengths() == array<len_type,3>{4, 2, 5});
+    CHECK(v5.strides() == array<stride_type,3>{10, 5, 1});
+    CHECK(v2.data() == v1.data());
+
+    auto v6 = v1(all, range(0), all).view().reshaped(0, 4, 2, 5, 11);
+    CHECK(v6.lengths() == array<len_type,5>{0, 4, 2, 5, 11});
 }
 
 TEST_CASE("marray::rotate")

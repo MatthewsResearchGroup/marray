@@ -8,6 +8,7 @@
 
 #include "array_1d.hpp"
 #include "detail/utility.hpp"
+#include "marray/fwd/marray_fwd.hpp"
 #include "marray_slice.hpp"
 #include "index_iterator.hpp"
 
@@ -25,7 +26,7 @@ inline stride_vector strides(const array_1d<len_type>& len, layout layout = DEFA
 
     MARRAY_ASSERT(len_.size() > 0);
 
-    int ndim = len_.size();
+    auto ndim = int(len_.size());
     stride_vector stride(ndim);
 
     if (layout == ROW_MAJOR)
@@ -260,6 +261,8 @@ class marray_base
             return static_cast<Derived&>(*this);
         }
 
+#ifndef MARRAY_DISABLE_VECTOR_CONSTRUCTOR
+
         /**
          * Reset to a view that wraps an immutable std::vector of compatible type.
          *
@@ -304,6 +307,8 @@ class marray_base
             return reset({v.size()}, v.data(), {1});
         }
 
+#endif
+
         /**
          * Reset to a view of the given tensor, view, or partially-indexed tensor.
          *
@@ -323,6 +328,8 @@ class marray_base
         Derived& reset(marray_base<U, N, D, O>& other)
         {
             static_assert(NDim == DYNAMIC || N == DYNAMIC || NDim == N);
+            if (other.dimension() == 0)
+                return reset();
             inherit_bbox_(other);
             return reset(other.lengths(), other.data(), other.bases(), other.strides());
         }
@@ -338,6 +345,8 @@ class marray_base
         Derived& reset(const marray_base<U, N, D, O>& other)
         {
             static_assert(NDim == DYNAMIC || N == DYNAMIC || NDim == N);
+            if (other.dimension() == 0)
+                return reset();
             inherit_bbox_(other);
             return reset(other.lengths(), other.data(), other.bases(), other.strides());
         }
@@ -633,19 +642,19 @@ class marray_base
 
             if constexpr (std::is_same_v<std::decay_t<Arg>,bcast_t>)
             {
-                return marray_slice<T, N, 0, bcast_dim>{*this, slice::bcast}(args...);
+                return marray_slice<T, N, 0, bcast_dim>{*this, slice::bcast}(args...).view();
             }
             else if constexpr (std::is_same_v<std::decay_t<Arg>,all_t>)
             {
-                return marray_slice<T, N, 1, slice_dim>{*this, range(length(0))}(args...);
+                return marray_slice<T, N, 1, slice_dim>{*this, range(length(0))}(args...).view();
             }
             else if constexpr (std::is_convertible_v<Arg,len_type>)
             {
-                return marray_slice<T, N, 1>{*this, arg}(args...);
+                return marray_slice<T, N, 1>{*this, arg}(args...).view();
             }
             else
             {
-                return marray_slice<T, N, 1, slice_dim>{*this, arg}(args...);
+                return marray_slice<T, N, 1, slice_dim>{*this, arg}(args...).view();
             }
         }
 
@@ -1805,6 +1814,187 @@ class marray_base
         /** @} */
         /***********************************************************************
          *
+         * @name Reshaping
+         *
+         **********************************************************************/
+        /** @{ */
+
+        /**
+         * Return a reshaped view, possibly of different dimensionality.
+         *
+         * In order to be successfully reshaped, consecutive groups of indices which have
+         * contiguous storage in the original view (i.e. the indices in the group are collectively
+         * row-major or column-major with no gaps in storage) must map exactly (meaning, must have
+         * the same total size) onto corresponding groups of indices in the reshaped view. It is not necessary for
+         * the entire view to have contiguous storage so long as groups of indices can be mapped
+         * independently. For each group of indices, the layout in the new view is determined by
+         * the base (lowest) stride for the group combined with row-major or column-major layout
+         * as determined by the layout of the original group. If the original group is a single
+         * index, layout is inferred from relative strides of surrounding indices. In particular this means that
+         * mapping index j in ...ijk... as a singleton group is only legal is stride[i] > stride[j] >
+         * stride[k] (row-major) or stride[i] < stride[j] < stride[k] (column-major).
+         *
+         * @tparam NewNDim  The number of dimensions in the reshaped view or [DYNAMIC](@ref MArray::DYNAMIC).
+         *                  If `lengths` is a comma-separated list of split points (e.g. `t.reshaped(1, 3, 4)`),
+         *                  then `NewNDim` is deduced as the number of lengths provided.
+         *
+         * @param lengths The lengths of the reshaped view. If `NewNDim` is not [DYNAMIC](@ref MArray::DYNAMIC),
+         *                then the size of `lengths` must equal `NewNDim`.
+         *
+         * @return      A possibly-mutable tensor view. For a tensor
+         *              ([marray](@ref MArray::marray)), the returned view is
+         *              mutable if the instance is not const-qualified.
+         *              For a tensor view ([marray_view](@ref MArray::marray_view)),
+         *              the returned view is mutable if the value type is not
+         *              const-qualified.
+         */
+        template <int NewNDim=DYNAMIC>
+#if MARRAY_DOXYGEN
+        possibly_mutable_view reshaped(const array_1d<len_type>& lengths);
+#else
+        marray_view<Type, NewNDim> reshaped(const array_1d<len_type>& lengths_)
+        {
+            static_assert(NewNDim == DYNAMIC || NewNDim > 0,
+                          "Cannot reshape into this number of dimensions");
+
+            MARRAY_ASSERT(NewNDim == DYNAMIC || lengths_.size() == NewNDim);
+
+            auto new_dimension = lengths_.size();
+            detail::array_type_t<stride_type,NewNDim> new_lengths;
+            detail::array_type_t<stride_type,NewNDim> new_strides;
+            lengths_.slurp(new_lengths);
+            if constexpr (NewNDim == DYNAMIC) new_strides.resize(new_dimension);
+
+            for (auto l : new_lengths)
+                MARRAY_ASSERT(l >= 0);
+
+            // If both the original and reshaped views
+            // have zero elements, allow any shape since
+            // there are no addressable elements.
+            for (auto l : new_lengths)
+            if (l == 0)
+            {
+                auto found = false;
+                for (auto old_l : lengths())
+                if (old_l == 0)
+                    found = true;
+                MARRAY_ASSERT(found);
+
+                return marray_view<Type,NewNDim>{new_lengths, nullptr, new_strides};
+            }
+
+            // Remove singleton dimensions
+            len_vector old_lengths(lengths().begin(), lengths().end());
+            stride_vector old_strides(strides().begin(), strides().end());
+            auto old_dimension = 0;
+            for (auto i = 0;i < dimension();i++)
+            if (old_lengths[i] > 1)
+            {
+                old_lengths[old_dimension] = old_lengths[i];
+                old_strides[old_dimension] = old_strides[i];
+                old_dimension++;
+            }
+
+            auto is_row_contiguous = [&](auto i){ return i < old_dimension-1 && old_strides[i] == old_strides[i+1]*old_lengths[i+1]; };
+            auto is_col_contiguous = [&](auto i){ return i < old_dimension-1 && old_strides[i]*old_lengths[i] == old_strides[i+1]; };
+            auto relative_order = [&](auto i, auto j){ return old_strides[i] < old_strides[j] ? COLUMN_MAJOR : ROW_MAJOR; };
+
+            auto old_end = 0, new_end = 0;
+            for (auto old_begin = 0, new_begin = 0;
+                old_begin < old_dimension && new_begin < new_dimension;
+                old_begin = old_end, new_begin = new_end)
+            {
+                // Determine contiguous region [begin,end]
+                // and layout, possibly with help from surrounding context
+                layout order = DEFAULT_LAYOUT;
+                if (is_row_contiguous(old_begin))
+                {
+                    order = ROW_MAJOR;
+                    while (is_row_contiguous(old_end)) old_end++;
+                }
+                else if (is_col_contiguous(old_begin))
+                {
+                    order = COLUMN_MAJOR;
+                    while (is_col_contiguous(old_end)) old_end++;
+                }
+                else
+                {
+                    if (old_begin > 0)
+                    {
+                        order = relative_order(old_begin-1, old_begin);
+                        if (old_begin < old_dimension-1)
+                            MARRAY_ASSERT(order == relative_order(old_begin, old_begin+1));
+                    }
+                    else if (old_begin < old_dimension-1)
+                    {
+                        order = relative_order(old_begin, old_begin+1);
+                    }
+
+                    old_end = old_begin;
+                }
+
+                // Convert to [begin,end)
+                old_end++;
+
+                // Determine the total size of the contiguous region
+                len_type size = 1;
+                for (auto i : range(old_begin, old_end))
+                    size *= old_lengths[i];
+
+                // Find as many new dimensions as possible which fit in the
+                // contiguous size
+                len_type new_size = 1;
+                while (new_end < new_dimension && new_size * new_lengths[new_end] <= size)
+                    new_size *= new_lengths[new_end++];
+                // In the end, the fit should be exact
+                MARRAY_ASSERT(new_size == size);
+
+                if (order == ROW_MAJOR)
+                {
+                    new_strides[new_end-1] = old_strides[old_end-1];
+                    for (auto i : reversed_range(new_begin, new_end-1))
+                        new_strides[i] = new_strides[i+1]*new_lengths[i+1];
+                }
+                else
+                {
+                    new_strides[new_begin] = old_strides[old_begin];
+                    for (auto i : range(new_begin, new_end-1))
+                        new_strides[i+1] = new_strides[i]*new_lengths[i];
+                }
+            }
+            MARRAY_ASSERT(old_end == old_dimension);
+            MARRAY_ASSERT(new_end == new_dimension);
+
+            return marray_view<Type,NewNDim>{new_lengths, data(), new_strides};
+        }
+
+        /* Inherit docs */
+        template <int NewNDim=DYNAMIC>
+        auto reshaped(const array_1d<len_type>& lengths) const
+        {
+            return const_cast<marray_base&>(*this).reshaped<NewNDim>(lengths);
+        }
+
+        /* Inherit docs */
+        template <typename... Lengths>
+        std::enable_if_t<detail::are_convertible<len_type,Lengths...>::value,marray_view<Type,sizeof...(Lengths)>>
+        reshaped(const Lengths... lengths)
+        {
+            return reshaped<sizeof...(Lengths)>({(len_type)lengths...});
+        }
+
+        /* Inherit docs */
+        template <typename... Lengths>
+        std::enable_if_t<detail::are_convertible<len_type,Lengths...>::value,marray_view<ctype,sizeof...(Lengths)>>
+        reshaped(const Lengths... lengths) const
+        {
+            return reshaped<sizeof...(Lengths)>({(len_type)lengths...});
+        }
+#endif
+
+        /** @} */
+        /***********************************************************************
+         *
          * @name Reversal
          *
          **********************************************************************/
@@ -2668,7 +2858,7 @@ class marray_base
          */
         constexpr int dimension() const
         {
-            return lengths().size();
+            return int(lengths().size());
         }
 
         /** @} */

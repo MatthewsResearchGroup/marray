@@ -662,6 +662,16 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
         /** @} */
         /***********************************************************************
          *
+         * @name Reshaping
+         *
+         **********************************************************************/
+        /** @{ */
+
+        using base_class::reshaped;
+
+        /** @} */
+        /***********************************************************************
+         *
          * @name Reversal
          *
          **********************************************************************/
@@ -935,6 +945,9 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
         template <typename U, int N, typename D, bool O>
         marray& reset(const marray_base<U, N, D, O>& other, MArray::index_base base, layout layout)
         {
+            if (other.dimension() == 0)
+                return reset();
+
             if (std::is_scalar<Type>::value)
             {
                 reset(other.lengths(), uninitialized, base, layout);
@@ -1382,6 +1395,9 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
          */
         marray& resize(const array_1d<len_type>& len, const Type& val=Type())
         {
+            if (dimension() == 0)
+                return reset(len, val);
+
             detail::array_type_t<len_type, NDim> new_len;
             len.slurp(new_len);
 

@@ -421,6 +421,16 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
         /** @} */
         /***********************************************************************
          *
+         * @name Reshaping
+         *
+         **********************************************************************/
+        /** @{ */
+
+        using base_class::reshaped;
+
+        /** @} */
+        /***********************************************************************
+         *
          * @name Reversal
          *
          **********************************************************************/
@@ -744,13 +754,67 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
          *              one-dimensional container type whose elements are convertible
          *              to `int`, including initializer lists.
          */
-#if !MARRAY_DOXYGEN
+#if MARRAY_DOXYGEN
+        void lower(const array_1d<int>& split);
+#else
         template <typename=void, int N=NDim, typename=std::enable_if_t<N==DYNAMIC>>
-#endif
         void lower(const array_1d<int>& split)
         {
             reset(lowered(split));
         }
+
+        /* Inherit docs */
+        template <typename... Splits>
+        std::enable_if_t<detail::are_convertible<int,Splits...>::value && NDim == DYNAMIC>
+        lower(const Splits... lengths)
+        {
+            lower({(len_type)lengths...});
+        }
+#endif
+
+        /** @} */
+        /***********************************************************************
+         *
+         * @name Reshaping
+         *
+         **********************************************************************/
+        /** @{ */
+
+        /**
+         * Reshape a view, possibly changing the dimensionality.
+         *
+         * In order to be successfully reshaped, consecutive groups of indices which have
+         * contiguous storage in the original view (i.e. the indices in the group are collectively
+         * row-major or column-major with no gaps in storage) must map exactly (meaning, must have
+         * the same total size) onto corresponding groups of indices in the reshaped view. It is not necessary for
+         * the entire view to have contiguous storage so long as groups of indices can be mapped
+         * independently. For each group of indices, the layout in the new view is determined by
+         * the base (lowest) stride for the group combined with row-major or column-major layout
+         * as determined by the layout of the original group. If the original group is a single
+         * index, layout is inferred from relative strides of surrounding indices. In particular this means that
+         * mapping index j in ...ijk... as a singleton group is only legal is stride[i] > stride[j] >
+         * stride[k] (row-major) or stride[i] < stride[j] < stride[k] (column-major).
+         *
+         * @param lengths The lengths of the reshaped view. If `NewNDim` is not [DYNAMIC](@ref MArray::DYNAMIC),
+         *                then the size of `lengths` must equal `NewNDim`.
+         */
+#if MARRAY_DOXYGEN
+        void reshape(const array_1d<len_type>& lengths);
+#else
+        template <typename=void, int N=NDim, typename=std::enable_if_t<N==DYNAMIC>>
+        void reshape(const array_1d<len_type>& lengths)
+        {
+            reset(reshaped(lengths));
+        }
+
+        /* Inherit docs */
+        template <typename... Lengths>
+        std::enable_if_t<detail::are_convertible<len_type,Lengths...>::value && (NDim == DYNAMIC || NDim == sizeof...(Lengths))>
+        reshape(const Lengths... lengths)
+        {
+            reset(reshaped(lengths...));
+        }
+#endif
 
         /** @} */
         /***********************************************************************
