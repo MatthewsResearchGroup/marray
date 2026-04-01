@@ -4,8 +4,7 @@
 #include "../range.hpp"
 #include "../marray_base.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 class dpd_index
 {
@@ -124,8 +123,8 @@ struct sliced_dimension<Arg, Args...>
         sliced_dimension<Args...>::value;
 };
 
-}
+} //namespace detail
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_DPD_RANGE_HPP

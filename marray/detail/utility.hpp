@@ -1,27 +1,15 @@
 #ifndef MARRAY_UTILITY_HPP
 #define MARRAY_UTILITY_HPP
 
-#include <cassert>
 #include <cstdint>
 #include <array>
 #include <type_traits>
 
-#ifndef MARRAY_ASSERT
-#ifdef MARRAY_ENABLE_ASSERTS
-#define MARRAY_ASSERT(e) assert(e)
-#else
-#define MARRAY_ASSERT(e) ((void)0)
-#endif
-#endif
-
-#define MARRAY_LIKELY(x) __builtin_expect((x),1)
-#define MARRAY_UNLIKELY(x) __builtin_expect((x),0)
-
+#include "config.hpp"
 #include "../types.hpp"
 #include "../fwd/marray_fwd.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 struct all_t;
 struct bcast_t;
@@ -458,7 +446,8 @@ void assign(std::array<T, N>& lhs, const C&... rhs)
     assign_helper<0>(lhs, rhs...);
 }
 
-}
-}
+} //namespace detail
+
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_UTILITY_HPP

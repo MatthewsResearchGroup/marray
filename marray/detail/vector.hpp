@@ -5,13 +5,14 @@
 #include <complex>
 #include <type_traits>
 
+#include "utility.hpp"
+
 #if __GNUC__ >= 6
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wignored-attributes"
 #endif
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <typename T, typename=void>
 struct vector_traits
@@ -21,7 +22,7 @@ struct vector_traits
     typedef T vector_type;
 };
 
-}
+MARRAY_END_NAMESPACE
 
 #if defined(__AVX512F__)
 

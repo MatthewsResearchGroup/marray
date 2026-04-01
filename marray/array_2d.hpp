@@ -3,8 +3,8 @@
 
 #include "array_1d.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
+
 namespace detail
 {
 
@@ -270,6 +270,6 @@ class array_2d
         }
 };
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_ARRAY_2D_HPP

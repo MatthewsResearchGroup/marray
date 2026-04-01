@@ -6,8 +6,8 @@
 
 #include "../types.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
+
 /**
  * A partially-indexed tensor.
  *
@@ -118,7 +118,9 @@ struct layout
 
     constexpr explicit layout(int type, construct) : type(type) {}
 
-    bool operator==(const layout&) const = default;
+    bool operator==(const layout& other) const { return type == other.type; }
+    
+    bool operator!=(const layout& other) const { return type != other.type; }
 };
 
 /**
@@ -170,7 +172,9 @@ struct index_base
 
     constexpr explicit index_base(int type, construct) : type(type) {}
 
-    bool operator==(const index_base&) const = default;
+    bool operator==(const index_base& other) const { return type == other.type; }
+
+    bool operator!=(const index_base& other) const { return type != other.type; }
 };
 
 /**
@@ -250,6 +254,6 @@ constexpr index_base DEFAULT_BASE;
 constexpr index_base DEFAULT_BASE{MARRAY_DEFAULT_BASE};
 #endif
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_MARRAY_FWD_HPP

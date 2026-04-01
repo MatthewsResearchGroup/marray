@@ -7,8 +7,7 @@
 
 #include "vector.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <>
 struct vector_traits<float>
@@ -2894,7 +2893,7 @@ struct vector_traits<U, std::enable_if_t<std::is_same<U,int64_t>::value ||
     }
 };
 
-}
+MARRAY_END_NAMESPACE
 
 #endif
 

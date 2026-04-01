@@ -3,8 +3,7 @@
 
 #include "marray_view.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <typename Type, int NDim, typename Allocator>
 class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, true>
@@ -46,6 +45,8 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
          */
         marray() {}
 
+#ifndef MARRAY_DISABLE_VECTOR_CONSTRUCTOR
+
         /**
          * Construct a tensor by copying a std::vector of compatible type.
          *
@@ -64,6 +65,8 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
         {
             reset(v);
         }
+
+#endif //MARRAY_DISABLE_VECTOR_CONSTRUCTOR
 
         /**
          * Copy constructor.
@@ -659,6 +662,16 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
         /** @} */
         /***********************************************************************
          *
+         * @name Reshaping
+         *
+         **********************************************************************/
+        /** @{ */
+
+        using base_class::reshaped;
+
+        /** @} */
+        /***********************************************************************
+         *
          * @name Reversal
          *
          **********************************************************************/
@@ -776,6 +789,8 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
             return *this;
         }
 
+#ifndef MARRAY_DISABLE_VECTOR_CONSTRUCTOR
+
         /**
          * Re-initialize the tensor by copying a std::vector of compatible type.
          *
@@ -797,6 +812,8 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
         {
             return reset(marray_view<const T,1>{v});
         }
+
+#endif //MARRAY_DISABLE_VECTOR_CONSTRUCTOR
 
         /**
          * Re-initialize the tensor by copying another tensor or tensor view.
@@ -928,6 +945,9 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
         template <typename U, int N, typename D, bool O>
         marray& reset(const marray_base<U, N, D, O>& other, MArray::index_base base, layout layout)
         {
+            if (other.dimension() == 0)
+                return reset();
+
             if (std::is_scalar<Type>::value)
             {
                 reset(other.lengths(), uninitialized, base, layout);
@@ -1375,6 +1395,9 @@ class marray : public marray_base<Type, NDim, marray<Type, NDim, Allocator>, tru
          */
         marray& resize(const array_1d<len_type>& len, const Type& val=Type())
         {
+            if (dimension() == 0)
+                return reset(len, val);
+
             detail::array_type_t<len_type, NDim> new_len;
             len.slurp(new_len);
 
@@ -1568,6 +1591,6 @@ void swap(marray<Type, NDim, Allocator>& a, marray<Type, NDim, Allocator>& b)
     a.swap(b);
 }
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_MARRAY_HPP

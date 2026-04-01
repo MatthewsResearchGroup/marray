@@ -5,8 +5,7 @@
 
 #include "range.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -516,6 +515,6 @@ make_iterator(const Lengths& len,
     return {len, strides...};
 }
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_INDEX_ITERATOR_HPP

@@ -15,8 +15,7 @@ if ((x).size()) \
     MARRAY_ASSERT((x).back() >= (from) && (x).back() < (to)); \
 }
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 namespace detail
 {
@@ -90,9 +89,29 @@ class range_t
                     return val_ == other.val_ && delta_ == other.delta_;
                 }
 
-                auto operator<=>(const iterator& other) const
+                bool operator!=(const iterator& other) const
                 {
-                    return val_ <=> other.val_;
+                    return val_ != other.val_ || delta_ != other.delta_;
+                }
+
+                auto operator<(const iterator& other) const
+                {
+                    return val_ < other.val_;
+                }
+
+                auto operator>(const iterator& other) const
+                {
+                    return val_ > other.val_;
+                }
+
+                auto operator<=(const iterator& other) const
+                {
+                    return val_ <= other.val_;
+                }
+
+                auto operator>=(const iterator& other) const
+                {
+                    return val_ >= other.val_;
                 }
 
                 value_type operator*() const
@@ -643,6 +662,7 @@ auto reversed_rangeN(T to, U N, V delta)
     return range(to-delta, to-(N+1)*delta, -delta);
 }
 
-} // namespace MArray
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_RANGE_HPP
+

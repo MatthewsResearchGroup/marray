@@ -4,8 +4,7 @@
 #include "detail/utility.hpp"
 #include "marray_base.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <typename Type, int NDim>
 class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, false>
@@ -23,7 +22,7 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
         using base_class::stride_;
         using base_class::data_;
 
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
         using base_class::bbox_len_;
         using base_class::bbox_off_;
         using base_class::bbox_stride_;
@@ -422,6 +421,16 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
         /** @} */
         /***********************************************************************
          *
+         * @name Reshaping
+         *
+         **********************************************************************/
+        /** @{ */
+
+        using base_class::reshaped;
+
+        /** @} */
+        /***********************************************************************
+         *
          * @name Reversal
          *
          **********************************************************************/
@@ -529,7 +538,7 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
             MARRAY_ASSERT(dim >= 0 && dim < dimension());
             data_ += n * stride(dim);
 
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
             bbox_off_[dim] += n * stride(dim) / bbox_stride_[dim];
             MARRAY_ASSERT(bbox_off_[dim] >= 0);
             MARRAY_ASSERT(bbox_off_[dim] + length(dim) * std::abs(stride(dim)) / bbox_stride_[dim] <= bbox_len_[dim]);
@@ -556,7 +565,7 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
             data_ += n * stride(dim);
             len_[dim] = len;
 
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
             bbox_off_[dim] += n * stride(dim) / bbox_stride_[dim];
             MARRAY_ASSERT(bbox_off_[dim] >= 0);
             MARRAY_ASSERT(bbox_off_[dim] + length(dim) * std::abs(stride(dim)) / bbox_stride_[dim] <= bbox_len_[dim]);
@@ -653,7 +662,7 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
             dim_vector perm_;
             perm.slurp(perm_);
 
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
             auto bbox_len = bbox_len_;
             auto bbox_off = bbox_off_;
             auto bbox_stride = bbox_stride_;
@@ -668,7 +677,7 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
                 len_[i] = len[perm_[i]];
                 stride_[i] = stride[perm_[i]];
 
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
                 bbox_len_[i] = bbox_len[perm_[i]];
                 bbox_off_[i] = bbox_off[perm_[i]];
                 bbox_stride_[i] = bbox_stride[perm_[i]];
@@ -745,13 +754,67 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
          *              one-dimensional container type whose elements are convertible
          *              to `int`, including initializer lists.
          */
-#if !MARRAY_DOXYGEN
+#if MARRAY_DOXYGEN
+        void lower(const array_1d<int>& split);
+#else
         template <typename=void, int N=NDim, typename=std::enable_if_t<N==DYNAMIC>>
-#endif
         void lower(const array_1d<int>& split)
         {
             reset(lowered(split));
         }
+
+        /* Inherit docs */
+        template <typename... Splits>
+        std::enable_if_t<detail::are_convertible<int,Splits...>::value && NDim == DYNAMIC>
+        lower(const Splits... lengths)
+        {
+            lower({(len_type)lengths...});
+        }
+#endif
+
+        /** @} */
+        /***********************************************************************
+         *
+         * @name Reshaping
+         *
+         **********************************************************************/
+        /** @{ */
+
+        /**
+         * Reshape a view, possibly changing the dimensionality.
+         *
+         * In order to be successfully reshaped, consecutive groups of indices which have
+         * contiguous storage in the original view (i.e. the indices in the group are collectively
+         * row-major or column-major with no gaps in storage) must map exactly (meaning, must have
+         * the same total size) onto corresponding groups of indices in the reshaped view. It is not necessary for
+         * the entire view to have contiguous storage so long as groups of indices can be mapped
+         * independently. For each group of indices, the layout in the new view is determined by
+         * the base (lowest) stride for the group combined with row-major or column-major layout
+         * as determined by the layout of the original group. If the original group is a single
+         * index, layout is inferred from relative strides of surrounding indices. In particular this means that
+         * mapping index j in ...ijk... as a singleton group is only legal is stride[i] > stride[j] >
+         * stride[k] (row-major) or stride[i] < stride[j] < stride[k] (column-major).
+         *
+         * @param lengths The lengths of the reshaped view. If `NewNDim` is not [DYNAMIC](@ref MArray::DYNAMIC),
+         *                then the size of `lengths` must equal `NewNDim`.
+         */
+#if MARRAY_DOXYGEN
+        void reshape(const array_1d<len_type>& lengths);
+#else
+        template <typename=void, int N=NDim, typename=std::enable_if_t<N==DYNAMIC>>
+        void reshape(const array_1d<len_type>& lengths)
+        {
+            reset(reshaped(lengths));
+        }
+
+        /* Inherit docs */
+        template <typename... Lengths>
+        std::enable_if_t<detail::are_convertible<len_type,Lengths...>::value && (NDim == DYNAMIC || NDim == sizeof...(Lengths))>
+        reshape(const Lengths... lengths)
+        {
+            reset(reshaped(lengths...));
+        }
+#endif
 
         /** @} */
         /***********************************************************************
@@ -825,7 +888,7 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
             MARRAY_ASSERT(dim >= 0 && dim < dimension());
             MARRAY_ASSERT(len >= 0);
             std::swap(len, len_[dim]);
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
             MARRAY_ASSERT(bbox_off_[dim] + length(dim) * std::abs(stride(dim)) / bbox_stride_[dim] <= bbox_len_[dim]);
 #endif
             return len;
@@ -864,7 +927,7 @@ class marray_view : public marray_base<Type, NDim, marray_view<Type, NDim>, fals
         {
             MARRAY_ASSERT(dim >= 0 && dim < dimension());
             std::swap(str, stride_[dim]);
-#ifdef MARRAY_ENABLE_ASSERTS
+#if MARRAY_DEBUG
             MARRAY_ASSERT(std::abs(stride(dim)) % bbox_stride_[dim] == 0);
             MARRAY_ASSERT(bbox_off_[dim] + length(dim) * std::abs(stride(dim)) / bbox_stride_[dim] <= bbox_len_[dim]);
 #endif
@@ -907,6 +970,6 @@ void swap(marray_view<Type, NDim>& a, marray_view<Type, NDim>& b)
     a.swap(b);
 }
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_MARRAY_VIEW_HPP

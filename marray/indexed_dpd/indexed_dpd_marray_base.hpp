@@ -4,8 +4,7 @@
 #include "../dpd/dpd_marray.hpp"
 #include "../indexed/indexed_marray.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <typename Type, typename Derived, bool Owner>
 class indexed_dpd_marray_base;
@@ -681,6 +680,6 @@ class indexed_dpd_marray_base : detail::dpd_base
         }
 };
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_INDEXED_DPD_MARRAY_BASE_HPP

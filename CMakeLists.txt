@@ -29,6 +29,7 @@ option(ENABLE_TESTS "Enable building unit tests." OFF)
 option(ENABLE_COVERAGE "Enable code coverage reporting for tests (requires clang)." OFF)
 
 set(MARRAY_HEADERS
+    marray/detail/config.hpp
     marray/detail/utility.hpp
     marray/detail/vector_avx.hpp
     marray/detail/vector_avx512.hpp
@@ -87,6 +88,10 @@ if(ENABLE_TESTS)
     FetchContent_MakeAvailable(Catch2)
 
     get_target_property(CATCH2_INCLUDES Catch2::Catch2 INTERFACE_INCLUDE_DIRECTORIES)
+    # For some reason there is an empty entry at the end of the list, and all
+    # other attempts to get rid of it do not work. If this empty entry ever goes
+    # away then this will be wrong.
+    list(POP_BACK CATCH2_INCLUDES)
     set(CATCH2_CFLAGS "$<LIST:TRANSFORM,${CATCH2_INCLUDES},PREPEND,-I>")
 
     if(ENABLE_COVERAGE)
@@ -205,7 +210,6 @@ if(ENABLE_TESTS)
                     "${INCLUDE_LIST}"
                     "-I${CMAKE_CURRENT_SOURCE_DIR}"
                     "${CATCH2_CFLAGS}"
-	                -DMARRAY_ENABLE_ASSERTS
                     > "${PROCESSED_DIR}/${file}"
                 COMMAND_EXPAND_LISTS
                 DEPENDS ${file} force-cover-build
@@ -224,7 +228,6 @@ if(ENABLE_TESTS)
                     "${INCLUDE_LIST}"
                     "-I${CMAKE_CURRENT_SOURCE_DIR}"
                     "${CATCH2_CFLAGS}"
-	                -DMARRAY_ENABLE_ASSERTS
                     > "${PROCESSED_DIR}/${file}"
                 COMMAND_EXPAND_LISTS
                 DEPENDS ${file} force-cover-build ${PROCESSED_HEADERS}
@@ -253,6 +256,7 @@ if(ENABLE_TESTS)
 endif()
 
 add_library(marray INTERFACE)
+add_library(MArray::marray ALIAS marray)
 target_include_directories(marray INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:${INSTALL_INCLUDEDIR}>
@@ -278,6 +282,11 @@ write_basic_package_version_file(
 
 install(FILES "MArrayConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/MArrayConfigVersion.cmake"
     DESTINATION ${INSTALL_LIBDIR}/cmake/MArray
+)
+
+export(EXPORT marray-targets
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/MArrayTargets.cmake
+    NAMESPACE MArray::
 )
 
 find_program(SPHINX sphinx-build)

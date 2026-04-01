@@ -7,18 +7,10 @@
 #include <limits>
 #include <stdexcept>
 #include <algorithm>
-#include <cassert>
 
-#ifndef MARRAY_ASSERT
-#ifdef MARRAY_ENABLE_ASSERTS
-#define MARRAY_ASSERT(e) assert(e)
-#else
-#define MARRAY_ASSERT(e) ((void)0)
-#endif
-#endif
+#include "detail/config.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
 
 template <typename T, size_t N, typename Allocator=std::allocator<T>>
 class short_vector
@@ -511,10 +503,31 @@ class short_vector
                    std::equal(begin(), end(), other.begin());
         }
 
-        auto operator<=>(const short_vector& other) const
+        bool operator!=(const short_vector& other) const
         {
-            return std::lexicographical_compare_three_way(begin(), end(),
+            return size() != other.size() ||
+                   !std::equal(begin(), end(), other.begin());
+        }
+
+        auto operator<(const short_vector& other) const
+        {
+            return std::lexicographical_compare(begin(), end(),
                                                           other.begin(), other.end());
+        }
+
+        auto operator>(const short_vector& other) const
+        {
+            return other < *this;
+        }
+
+        auto operator<=(const short_vector& other) const
+        {
+            return !(other < *this);
+        }
+
+        auto operator>=(const short_vector& other) const
+        {
+            return !(*this < other);
         }
 
     protected:
@@ -788,6 +801,6 @@ class short_vector
         };
 };
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_SHORT_VECTOR_HPP

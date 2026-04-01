@@ -3,8 +3,9 @@
 
 #include <type_traits>
 
-namespace MArray
-{
+#include "../detail/utility.hpp"
+
+MARRAY_BEGIN_NAMESPACE
 
 template <typename Expr, typename=void> struct is_expression;
 
@@ -32,6 +33,6 @@ std::enable_if_t<(is_array_expression<std::decay_t<Array>>::value ||
                     is_expression_arg_or_scalar<std::decay_t<Expr>>::value>
 assign_expr(Array&& array_, Expr&& expr_);
 
-}
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_EXPRESSION_FWD_HPP

@@ -8,8 +8,8 @@
 
 #include "detail/utility.hpp"
 
-namespace MArray
-{
+MARRAY_BEGIN_NAMESPACE
+
 namespace detail
 {
 
@@ -138,7 +138,8 @@ class array_1d
 
             virtual void slurp(T* x) const override
             {
-                std::copy_n(data.begin(), len, x);
+                auto y = data.begin();
+                std::copy_n(y, len, x);
             }
 
             virtual adaptor_base& copy(adaptor_base& other) override
@@ -213,6 +214,29 @@ class array_1d
         len_type size() const { return adaptor_.len; }
 };
 
-}
+/*
+ * No-op specialization for zero-length arrays.
+ * Otherwise, clang complains about memmove on null pointer.
+ */
+template <typename T>
+template <typename U>
+struct array_1d<T>::adaptor<std::array<U,0>> : adaptor_base
+{
+    adaptor(const std::array<U,0>&) : adaptor_base(0) {}
+
+    virtual void slurp(T*) const override {}
+
+    virtual adaptor_base& copy(adaptor_base& other) override
+    {
+        return *(new (static_cast<adaptor*>(&other)) adaptor(*this));
+    }
+
+    virtual adaptor_base& move(adaptor_base& other) override
+    {
+        return *(new (static_cast<adaptor*>(&other)) adaptor(std::move(*this)));
+    }
+};
+
+MARRAY_END_NAMESPACE
 
 #endif //MARRAY_ARRAY_1D_HPP
