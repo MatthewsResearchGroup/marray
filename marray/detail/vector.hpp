@@ -1,8 +1,8 @@
 #ifndef MARRAY_VECTOR_HPP
 #define MARRAY_VECTOR_HPP
 
-#include <cstring>
 #include <complex>
+#include <cstring>
 #include <type_traits>
 
 #include "utility.hpp"
@@ -14,8 +14,7 @@
 
 MARRAY_BEGIN_NAMESPACE
 
-template <typename T, typename=void>
-struct vector_traits
+template <typename T, typename = void> struct vector_traits
 {
     static constexpr int vector_width = 1;
     static constexpr int alignment = 1;
@@ -46,4 +45,4 @@ MARRAY_END_NAMESPACE
 #pragma GCC diagnostic pop
 #endif
 
-#endif //MARRAY_VECTOR_HPP
+#endif // MARRAY_VECTOR_HPP

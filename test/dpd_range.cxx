@@ -4,19 +4,22 @@
 using namespace std;
 using namespace MArray;
 
-#define CHECK_DPD_RANGE(r,f,s,d) \
-{ \
-    std::vector<len_type> front f; front.resize(8); \
-    std::vector<len_type> size s; size.resize(8); \
-    std::vector<len_type> delta d; delta.resize(8, 1); \
-    for (auto i : range(8)) \
-    { \
-        INFO("i = " << i); \
-        CHECK(front[i] == r[i].front()); \
-        CHECK(size[i] == r[i].size()); \
-        CHECK(delta[i] == r[i].step()); \
-    } \
-}
+#define CHECK_DPD_RANGE(r, f, s, d)          \
+    {                                        \
+        std::vector<len_type> front f;       \
+        front.resize(8);                     \
+        std::vector<len_type> size s;        \
+        size.resize(8);                      \
+        std::vector<len_type> delta d;       \
+        delta.resize(8, 1);                  \
+        for (auto i : range(8))              \
+        {                                    \
+            INFO("i = " << i);               \
+            CHECK(front[i] == r[i].front()); \
+            CHECK(size[i] == r[i].size());   \
+            CHECK(delta[i] == r[i].step());  \
+        }                                    \
+    }
 
 TEST_CASE("dpd_range::dpd_range")
 {
