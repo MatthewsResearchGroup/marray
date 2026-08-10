@@ -91,29 +91,9 @@ template <typename T> class range_t
             return val_ == other.val_ && delta_ == other.delta_;
         }
 
-        bool operator!=(const iterator& other) const
+        auto operator<=>(const iterator& other) const
         {
-            return val_ != other.val_ || delta_ != other.delta_;
-        }
-
-        auto operator<(const iterator& other) const
-        {
-            return val_ < other.val_;
-        }
-
-        auto operator>(const iterator& other) const
-        {
-            return val_ > other.val_;
-        }
-
-        auto operator<=(const iterator& other) const
-        {
-            return val_ <= other.val_;
-        }
-
-        auto operator>=(const iterator& other) const
-        {
-            return val_ >= other.val_;
+            return val_ <=> other.val_;
         }
 
         value_type operator*() const { return val_; }
@@ -228,6 +208,30 @@ template <typename T> class range_t
     }
 
     range_t& operator=(range_t&&) = default;
+
+    bool operator==(const range_t& other) const
+    {
+        return from_
+            == other.from_
+            && to_
+            == other.to_
+            && delta_
+            == other.delta_;
+    }
+
+    auto operator<=>(const range_t& other) const
+    {
+        if (*this == other)
+            return std::partial_ordering::equivalent;
+
+        if (back() <= other.front())
+            return std::partial_ordering::less;
+
+        if (other.back() <= front())
+            return std::partial_ordering::greater;
+
+        return std::partial_ordering::unordered;
+    }
 
     value_type step() const { return delta_; }
 
