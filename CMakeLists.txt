@@ -289,18 +289,20 @@ export(EXPORT marray-targets
     NAMESPACE MArray::
 )
 
-find_program(SPHINX sphinx-build)
+find_program(SPHINX sphinx-build HINTS "${CMAKE_CURRENT_SOURCE_DIR}/.venv/bin")
 find_program(DOXYGEN doxygen)
 
 if (SPHINX AND DOXYGEN)
     add_custom_target(marray-docs
-        COMMAND ${SPHINX} "${CMAKE_CURRENT_SOURCE_DIR}/docs" "${CMAKE_CURRENT_BINARY_DIR}docs/sphinx"
+        COMMAND ${SPHINX} "${CMAKE_CURRENT_SOURCE_DIR}/docs" "${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/docs"
+        COMMENT "Building documentation with sphinx and doxygen"
+        VERBATIM
     )
 else()
     add_custom_target(marray-docs
-        COMMAND ""
-        COMMENT "sphinx and doxygen (and the sphinx plugins breathe, \
-myst_parser, and sphinx-rtd-theme) are required for \
-building documentation"
+        COMMAND ${CMAKE_COMMAND} -E echo
+            "sphinx and doxygen (and the sphinx plugins breathe, myst_parser, and sphinx-rtd-theme) are required for building documentation"
+        VERBATIM
     )
 endif()

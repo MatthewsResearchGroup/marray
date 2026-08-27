@@ -645,6 +645,8 @@ class marray_view
      * Prepare the view for iteration "down" one dimension.
      *
      * @param dim   The dimension to be iterated over.
+     *
+     * @return      The original length along the indicated dimension.
      */
     len_type first(int dim) { return length(dim, 0); }
 
@@ -667,13 +669,13 @@ class marray_view
     /**
      * Resets the view back to its original state after iteration "down" one
      * dimension. Requires that @ref next(int, len_type) has been called with
-     * sizes totaling the original length (as returned by @ref first(int,
-     * len_type)), which must also be passed in as `len` here.
+     * sizes totaling the original length (as returned by @ref first(int)),
+     * which must also be passed in as `len` here.
      *
      * @param dim  The dimension along which to shift the view.
      *
      * @param len  The original length along the indicated dimension, as
-     *             returned by @ref first(int, len_type).
+     *             returned by @ref first(int).
      */
     void back_to_first(int dim, len_type len)
     {
@@ -685,6 +687,8 @@ class marray_view
      * Prepare the view for iteration "up" one dimension.
      *
      * @param dim   The dimension to be iterated over.
+     *
+     * @return      The original length along the indicated dimension.
      */
     len_type last(int dim)
     {
@@ -709,13 +713,13 @@ class marray_view
     /**
      * Resets the view back to its original state after iteration "up" one
      * dimension. Requires that @ref prev(int, len_type) has been called with
-     * sizes totaling the original length (as returned by
-     * @ref last(int, len_type)), which must also be passed in as `len` here.
+     * sizes totaling the original length (as returned by @ref last(int)),
+     * which must also be passed in as `len` here.
      *
      * @param dim  The dimension along which to shift the view.
      *
      * @param len  The original length along the indicated dimension, as
-     *             returned by @ref last(int, len_type).
+     *             returned by @ref last(int).
      */
     void back_to_last(int dim, len_type len) { length(dim, len); }
 

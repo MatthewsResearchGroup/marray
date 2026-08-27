@@ -1227,6 +1227,8 @@ class marray
      *                MArray::BASE_ZERO) or [BASE_ONE](@ref MArray::BASE_ONE)
      *                (a.k.a. [FORTRAN](@ref MArray::FORTRAN) or [MATLAB](@ref
      *                MArray::MATLAB)).
+     *
+     * @return      A reference to the marray.
      */
 #if MARRAY_DOXYGEN
     marray& reset(const array_1d<len_type>& len,
